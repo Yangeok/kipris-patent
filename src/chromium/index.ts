@@ -1,32 +1,72 @@
 import playwright, { Page } from 'playwright'
 import { parse } from 'node-html-parser'
 import axios from 'axios'
+import cliProgress, { SingleBar } from 'cli-progress'
 
 import { Indexable } from '../utils'
 
-async function getList(page: Page) {
+async function getList(page: Page, barl: SingleBar) {
   await page.goto('http://kpat.kipris.or.kr/kpat/searchLogina.do?next=MainSearch')
-  await page.type('#queryText', 'AD=[20100101~20210129]')
-  await page.evaluate(() => {
-    const { document } = (<Indexable>window)
-    document.querySelector('#opt28 option[value="90"]').selected = true
+  
+  const clickSearchButton = Promise.all([
+    await page.type('#queryText', 'AD=[20100101~20210129]'),
+    await page.click('.input_btn')
+  ])
+  const clickFilter = Promise.all([
+    await page.evaluate(() => {
+      const { document } = (<Indexable>window)
+      document.querySelector('#opt28 option[value="60"]').selected = true
+    }),
+    await page.click('#pageSel img')
+  ])
+
+  const waitForList = await page.waitForSelector('#loadingBarBack', {
+    state: 'hidden'
   })
-  await page.click('.input_btn')
-  await page.click('#pageSel a')
+
+  const contentsCount = await page.evaluate(() => {
+    return {
+      totalCount: Number((document.querySelector('.total') as HTMLElement).innerText.replace(/\,/g, '')),
+      currentPage: Number((document.querySelector('.current') as HTMLElement).innerText),
+      totalPage: Number(((document.querySelector('.articles') as HTMLElement).childNodes[5].nodeValue as string).replace(/[^0-9]/g, ''))
+    }
+  })
+
+  let currentPage = contentsCount.currentPage
+  while (currentPage < contentsCount.totalPage) {
+    await page.waitForSelector('.board_pager03')
+    Promise.all([
+      await getListData(page),
+      await page.$eval('.board_pager03 strong', el => (el.nextElementSibling as HTMLElement).click()),
+      await page.waitForSelector('#loadingBarBack', {
+        state: 'hidden'
+      }),
+    ])
+    currentPage += 1
+    barl.start(contentsCount.totalPage, currentPage)
+  }
 }
 
 async function getListData(page: Page) {
   await page.waitForSelector('.search_section')
   
-  const summaries = await getDataSummary(page)
-  Promise.all([
-    summaries.map(async i => await getDataDetail(i.applicationNumber))
-  ])
+  const summaries = await getDataSummaries(page)
+  const summaryDetails = await summaries.reduce(async (prevPromise, i) => {
+    await prevPromise
+    const details = await getDataDetails(i.applicationNumber)
+    const result = {
+      ...i,
+      applicants: details?.applicants,
+      inventors: details?.inventors 
+    }
+    console.log(result)
+    return result
+  }, <any>Promise.resolve())
 
-  // TODO: summary + detail
+  // TODO: 파일 저장
 }
 
-async function getDataSummary(page: Page) {
+async function getDataSummaries(page: Page) {
   const data = page.evaluate(() => {    
     const cards: HTMLElement[] = Array.from(document.querySelectorAll('article[id^="divView"]'))
     
@@ -48,7 +88,9 @@ async function getDataSummary(page: Page) {
   return data
 }
 
-async function getDataDetail(applicationNumber: string) {
+async function getDataDetails(applicationNumber: string) {
+  console.log(`> applicationNumber: ${applicationNumber}`)
+  try {
   // TODO: 서지정보
   // const { data: html01 } = await axios.get(`http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub01&applno=${applicationNumber}&getType=BASE&link=N`)
   // const document01 = parse(html01)
@@ -84,11 +126,6 @@ async function getDataDetail(applicationNumber: string) {
   /**
    * TODO: 대리인, 최종권리자
    */
-  const result = {
-    applicants,
-    inventors
-  }
-  console.log(result)
   
   // TODO: 행정처리 http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub03&applno=2020200003258&getType=Sub03&link=N
 
@@ -125,18 +162,26 @@ async function getDataDetail(applicationNumber: string) {
 
    // TODO: 국가 R&D 연구정보 http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub11&applno=2020200003258&getType=Sub11&link=N
 
-   /**
+  /**
     * TODO: 
     * 연구부처, 주관기관, 연구사업, 연구과제
     */
+    const result = {
+      applicants,
+      inventors
+    }
+    return result
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 (async function() {
+  const barl = new cliProgress.SingleBar({}, cliProgress.Presets.shades_grey)
   const browser = await playwright.chromium.launch({
     headless: false
   })
   const context = await browser.newContext()
   const page = await context.newPage()
-  await getList(page)
-  await getListData(page)
+  await getList(page, barl)
 })()
