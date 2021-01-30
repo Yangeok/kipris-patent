@@ -1,7 +1,10 @@
-import playwright from 'playwright'
+import playwright, { Page } from 'playwright'
+import { parse } from 'node-html-parser'
+import axios from 'axios'
+
 import { Indexable } from '../utils'
 
-async function getList(page: playwright.Page) {
+async function getList(page: Page) {
   await page.goto('http://kpat.kipris.or.kr/kpat/searchLogina.do?next=MainSearch')
   await page.type('#queryText', 'AD=[20100101~20210129]')
   await page.evaluate(() => {
@@ -12,16 +15,18 @@ async function getList(page: playwright.Page) {
   await page.click('#pageSel a')
 }
 
-async function getListData(page: playwright.Page, context: playwright.ChromiumBrowserContext) {
+async function getListData(page: Page) {
   await page.waitForSelector('.search_section')
   
   const summaries = await getDataSummary(page)
-  const details = await getDataDetail(page, context)
+  Promise.all([
+    summaries.map(async i => await getDataDetail(i.applicationNumber))
+  ])
 
-  // console.log({ summaries })
+  // TODO: summary + detail
 }
 
-async function getDataSummary(page: playwright.Page) {
+async function getDataSummary(page: Page) {
   const data = page.evaluate(() => {    
     const cards: HTMLElement[] = Array.from(document.querySelectorAll('article[id^="divView"]'))
     
@@ -43,40 +48,87 @@ async function getDataSummary(page: playwright.Page) {
   return data
 }
 
-async function getDataDetail(page: playwright.Page, context: playwright.ChromiumBrowserContext) {
-  const [newPage] = await Promise.all([
-    context.waitForEvent('page'),
-    page.evaluate(() => (document.querySelector('article[id^="divView"] .stitle a[title="새창으로 열림"]') as HTMLElement).click())
-  ])
+async function getDataDetail(applicationNumber: string) {
+  // TODO: 서지정보
+  // const { data: html01 } = await axios.get(`http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub01&applno=${applicationNumber}&getType=BASE&link=N`)
+  // const document01 = parse(html01)
 
-  console.log(await newPage)
-  await newPage.click('#liViewSub02 a')
-  
-  // FIXME: timeout 둘 중에 하나 고르기
-  await newPage.waitForTimeout(500)
-  // await newPage.waitForSelector('#divBiblioContent')
-  
-  const data = await newPage.evaluate(() => {
+  /**
+   * TODO: IPC, CPC, 출원일자/번호, 출원인, 등록번호/일자, 공개번호/일자
+   * 공고번호/일자, 국제출원번호/일자, 국제공개번호/일자, 법적상태, 심사진행상태, 심판사항, 구분, 원출원번호/일자, 관련 출원번호, 기술이전 희망, 심사청구여부/일자
+   */
 
-    // REF: 
-    // [...$$('td.name')].map(i => i.innerText)
-    // [...$$('td.nationality')].map(i => i.innerText)
-    // [...$$('td.nationality')].map(i => i.innerText)
-    // [...$$('td.txt_left')].map(i => i.innerText)
+  // FIXME: 인명정보
+  const { data: html } = await axios.get(`http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub02&applno=${applicationNumber}&getType=Sub02&link=N`)
+  const document = parse(html)
 
-    // FIXME: table 변수 작동시키기
-    // [...$$('.tstyle_list')].map(i => i.querySelector('tbody .name')?.innerText)
-    const table = document.querySelectorAll('.tstyle_list')
-    console.log({ table })
+  const applicants = [...document.querySelector('.depth2_title').nextElementSibling.querySelectorAll('tbody tr')].map(i => {
+    const name = i.querySelector('.name').innerText.replace(/\n/g, '').replace(/\t/g, '')
     return {
-      applicant: ((Array.from(document.querySelectorAll('.tstyle_list')) as HTMLElement[])[0].querySelector('tbody .name') as HTMLElement)?.innerText,
-      applicantNationality: ((Array.from(document.querySelectorAll('.tstyle_list')) as HTMLElement[])[0].querySelector('tbody .nationality') as HTMLElement)?.innerText,
-      applicantAddress: ((Array.from(document.querySelectorAll('.tstyle_list')) as HTMLElement[])[0].querySelector('tbody .txt_left') as HTMLElement)?.innerText,
-      inventor: ((Array.from(document.querySelectorAll('.tstyle_list')) as HTMLElement[])[1].querySelector('tbody .name') as HTMLElement)?.innerText,
-      inventorNationality: ((Array.from(document.querySelectorAll('.tstyle_list')) as HTMLElement[])[0].querySelector('tbody .nationality') as HTMLElement)?.innerText,
-      inventorAddress: ((Array.from(document.querySelectorAll('.tstyle_list')) as HTMLElement[])[0].querySelector('tbody .txt_left') as HTMLElement)?.innerText
+      name: name.split('(')[0],
+      number: name.split('(')[1] !== undefined ? name.split('(')[1].replace(')', '') : '',
+      nationality: i.querySelector('.nationality').innerText,
+      address: i.querySelector('.txt_left').innerText.replace('...', '')
     }
   })
+  const inventors = [...document.querySelector('.depth2_title02').nextElementSibling.querySelectorAll('tbody tr')].map(i => {
+    const name = i.querySelector('.name').innerText.replace(/\n/g, '').replace(/\t/g, '')
+    return {
+      name: name.split('(')[0],
+      number: name.split('(')[1] !== undefined ? name.split('(')[1].replace(')', '') : '',
+      nationality: i.querySelector('.nationality').innerText,
+      address: i.querySelector('.txt_left').innerText.replace('...', '')
+    }
+  })
+
+  /**
+   * TODO: 대리인, 최종권리자
+   */
+  const result = {
+    applicants,
+    inventors
+  }
+  console.log(result)
+  
+  // TODO: 행정처리 http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub03&applno=2020200003258&getType=Sub03&link=N
+
+  // TODO: 지정국 http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub06&applno=2020200003258&getType=Sub06&link=N
+
+
+  // 청구항
+  const { data: html02 } = await axios.get(`http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub04&applno=${applicationNumber}&getType=Sub04&link=N`)
+  const document02 = parse(html02)
+
+  /**
+   * TODO: 청구항 상세
+   */
+
+  // 인용/피인용
+  const { data: html03 } = await axios.get(`http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub07&applno=${applicationNumber}&getType=Sub07&link=N`)
+  const document03 = parse(html03)
+
+  /**
+   * TODO: 
+   * 인용 => 국가, 공보번호, 공보일자, 발명의 명칭, IPC
+   * 피인용 => 출원번호, 출원일자, 발명의 명칭, IPC
+   */
+
+  // 패밀리정보
+  const { data: html04 } = await axios.get(`http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub08&applno=${applicationNumber}&getType=Sub08&link=N`)
+  const document04 = parse(html04)
+  
+  /**
+   * TODO: 
+   * 국가별특허 문헌정보 => 패밀리번호, 국가코드, 국가명, 종류
+   * DOCDB 패밀리정보 => 패밀리번호, 국가코드, 국가명, ㅈ오류
+   */
+
+   // TODO: 국가 R&D 연구정보 http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub11&applno=2020200003258&getType=Sub11&link=N
+
+   /**
+    * TODO: 
+    * 연구부처, 주관기관, 연구사업, 연구과제
+    */
 }
 
 (async function() {
@@ -86,5 +138,5 @@ async function getDataDetail(page: playwright.Page, context: playwright.Chromium
   const context = await browser.newContext()
   const page = await context.newPage()
   await getList(page)
-  await getListData(page, context)
+  await getListData(page)
 })()
