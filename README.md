@@ -2,15 +2,14 @@
 
 ### Introduction
 
-POST  http://kpat.kipris.or.kr/kpat/searchLogina.do?next=MainSearch#page1
-응답없음
+- `POST  http://kpat.kipris.or.kr/kpat/searchLogina.do?next=MainSearch#page1`
+- 응답없음 => Chromium으로 추출
+![](./docs/Kipris-01.png)
 
-=> 크로미움으로 추출
+- `GET http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub01&applno=2020200003518&getType=BASE&link=N`
+- 응답있음 => html 파싱으로 추출
+![](./docs/Kipris-01.png)
 
-GET http://kpat.kipris.or.kr/kpat/biblioa.do?method=biblioMain_biblio&next=biblioViewSub01&applno=2020200003518&getType=BASE&link=N
-응답있음
-
-=> html 파싱으로 추출
 ### Installation & Execution
 
 ```sh
