@@ -1,13 +1,13 @@
+import cliProgress, { SingleBar } from 'cli-progress'
 import playwright, { Page } from 'playwright'
 import { parse } from 'node-html-parser'
-import axios from 'axios'
-import cliProgress, { SingleBar } from 'cli-progress'
-import * as fs from 'fs'
-import * as path from 'path'
 import fromEntries from 'fromentries'
+import { URLSearchParams } from 'url'
+import * as path from 'path'
+import axios from 'axios'
+import * as fs from 'fs'
 
 import { Indexable, sleep } from '../utils'
-import { URLSearchParams } from 'url'
 
 async function getList(page: Page, barl: SingleBar, params: {
   startDate: string, endDate: string, filePath: string
@@ -67,11 +67,15 @@ async function getListData(page: Page, params: { startDate: string, endDate: str
       registersNumber: details?.bibliographicData.registersNumber,
       registerDate: details?.bibliographicData.registerDate,
       astrtCont: details?.bibliographicData.astrtCont,
+      cpcs: details?.bibliographicData.cpcs,
+      ipcs: details?.bibliographicData.ipcs,
       claims: JSON.stringify(details?.claims),
-      citating: JSON.stringify(details?.citating),
-      citated: JSON.stringify(details?.citated),
-      familyPatents: JSON.stringify(details?.familyPatents)
+      claimsCount: details?.claims.length,
+      citating: JSON.stringify(details?.citating) !== '[null]' ? JSON.stringify(details?.citating) : '',
+      citated: JSON.stringify(details?.citated) !== '[null]' ? JSON.stringify(details?.citated) : '',
+      familyPatents: JSON.stringify(details?.familyPatents) !== '[null]' ? JSON.stringify(details?.familyPatents) : ''
     }
+    console.log(result)
     fs.appendFile(params.filePath, Object.values(result).join(', ') + '\n', err => err && console.log(`> saving file err`))
     return result
   }, <any>Promise.resolve())
@@ -87,7 +91,7 @@ async function getDataSummaries(page: Page) {
 
       return {
         inventionTitle: top.querySelector('.stitle a[title="새창으로 열림"]')?.innerHTML,
-        applicant: (bottom.querySelector('.right_width.letter1 a') as HTMLElement).innerText,
+        // applicant: (bottom.querySelector('.right_width.letter1 a') as HTMLElement).innerText,
         applicationNumber: (bottom.querySelector('.left_width[style="width: 54%;"] .point01') as HTMLElement)?.innerText.replace(')', '').replace(/\./g, '-').split(' (')[0],
         applicationDate: (bottom.querySelector('.left_width[style="width: 54%;"] .point01') as HTMLElement)?.innerText.replace(')', '').replace(/\./g, '-').split(' (')[1],
         // astrtCont: (bottom.querySelector('.search_txt') as HTMLElement).innerText,
@@ -176,7 +180,7 @@ async function getDataDetails(applicationNumber: string) {
 
     // 청구항
     const document04 = parse(html04)
-    const claims = [...document04.querySelectorAll('tbody .txt_left')].map(i => i.innerText.replace(/\n/g, '').replace(/\t/g, '')).filter(i => i !== '삭제')
+    const claims = [...document04.querySelectorAll('tbody .txt_left')].map(i => i.innerText.replace(/\n/g, '').replace(/\t/g, '').replace(/  /g, '')).filter(i => i !== '삭제')
 
     // 지정국 
     // const document05 = parse(html05)
@@ -212,7 +216,7 @@ async function getDataDetails(applicationNumber: string) {
       citating, citated,
       familyPatents
     }
-    sleep(250)
+    sleep(500)
     return result
   } catch (err) {
     console.log(err)
