@@ -3,3 +3,5 @@ yarn*
 
 .env*
 outputs/
+
+!outputs/.example.20100101-20210131.csv

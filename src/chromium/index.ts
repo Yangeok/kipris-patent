@@ -7,7 +7,7 @@ import * as path from 'path'
 import axios from 'axios'
 import * as fs from 'fs'
 
-import { Indexable, sleep } from '../utils'
+import { Indexable, sleep, promiseAllSleep, promiseDelay, promiseRaceAll } from '../utils'
 
 async function getList(page: Page, barl: SingleBar, params: {
   startDate: string, endDate: string, filePath: string
@@ -21,9 +21,11 @@ async function getList(page: Page, barl: SingleBar, params: {
   const clickFilter = Promise.all([
     await page.evaluate(() => {
       const { document } = (<Indexable>window)
-      document.querySelector('#opt28 option[value="60"]').selected = true
+      document.querySelector('#opt28 option[value="30"]').selected = true
+      document.querySelector('#opt28 option[value="30"]').value = 10
     }),
-    await page.click('#pageSel img')
+    await page.click('#pageSel img'),
+    await page.click('#pageSel a')
   ])
 
   const waitForList = await page.waitForSelector('#loadingBarBack', {
@@ -40,6 +42,7 @@ async function getList(page: Page, barl: SingleBar, params: {
 
   let currentPage = contentsCount.currentPage
   while (currentPage < contentsCount.totalPage) {
+    barl.start(contentsCount.totalPage, currentPage)
     await page.waitForSelector('.board_pager03')
     Promise.all([
       await getListData(page, params),
@@ -49,7 +52,6 @@ async function getList(page: Page, barl: SingleBar, params: {
       }),
     ])
     currentPage += 1
-    barl.start(contentsCount.totalPage, currentPage)
   }
 }
 
@@ -67,16 +69,16 @@ async function getListData(page: Page, params: { startDate: string, endDate: str
       registersNumber: details?.bibliographicData.registersNumber,
       registerDate: details?.bibliographicData.registerDate,
       astrtCont: details?.bibliographicData.astrtCont,
-      cpcs: details?.bibliographicData.cpcs,
-      ipcs: details?.bibliographicData.ipcs,
+      cpcs: JSON.stringify(details?.bibliographicData.cpcs),
+      ipcs: JSON.stringify(details?.bibliographicData.ipcs),
       claims: JSON.stringify(details?.claims),
       claimsCount: details?.claims.length,
       citating: JSON.stringify(details?.citating) !== '[null]' ? JSON.stringify(details?.citating) : '',
       citated: JSON.stringify(details?.citated) !== '[null]' ? JSON.stringify(details?.citated) : '',
       familyPatents: JSON.stringify(details?.familyPatents) !== '[null]' ? JSON.stringify(details?.familyPatents) : ''
     }
-    console.log(result)
-    fs.appendFile(params.filePath, Object.values(result).join(', ') + '\n', err => err && console.log(`> saving file err`))
+    
+    fs.appendFile(params.filePath, Object.values(result).join('|') + '\n', err => err && console.log(`> saving file err`))
     return result
   }, <any>Promise.resolve())
 }
@@ -104,8 +106,7 @@ async function getDataSummaries(page: Page) {
 }
 
 async function getDataDetails(applicationNumber: string) {
-  console.log(`> applicationNumber: ${applicationNumber}`)
-  
+  // console.log(`> applicationNumber: ${applicationNumber}`)
   const baseUrl = 'http://kpat.kipris.or.kr/kpat/biblioa.do?'
   const qs = new URLSearchParams()
   qs.set('method', 'biblioMain_biblio')
@@ -114,23 +115,23 @@ async function getDataDetails(applicationNumber: string) {
 
   try {
     const [
-      { data: html01 },
-      { data: html02 },
-      // { data: html03 },
-      { data: html04 },
-      // { data: html05 },
-      { data: html06 },
-      { data: html07 },
-      // { data: html08 }
+      { data: html01 }, {},
+      { data: html02 }, {},
+      // { data: html03 }, {},
+      { data: html04 }, {},
+      // { data: html05 }, {},
+      { data: html06 }, {},
+      { data: html07 }, {},
+      // { data: html08 }, {}
     ] = await Promise.all([
-      await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub01&getType=BASE`),
-      await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub02&getType=Sub02`),
-      // await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub03&getType=Sub03`),
-      await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub04&getType=Sub04`),
-      // await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub06&getType=Sub06`),
-      await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub07&getType=Sub07`),
-      await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub08&getType=Sub08`),
-      // await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub11&getType=Sub11`)
+      await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub01&getType=BASE`), promiseAllSleep(200),
+      await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub02&getType=Sub02`), promiseAllSleep(200),
+      // await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub03&getType=Sub03`), promiseAllSleep(200),
+      await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub04&getType=Sub04`), promiseAllSleep(200),
+      // await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub06&getType=Sub06`), promiseAllSleep(200),
+      await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub07&getType=Sub07`), promiseAllSleep(200),
+      await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub08&getType=Sub08`), promiseAllSleep(200),
+      // await axios.get(`${baseUrl}${qs.toString()}&next=biblioViewSub11&getType=Sub11`), promiseAllSleep(200)
     ])
 
     // 서지정보
@@ -151,9 +152,9 @@ async function getDataDetails(applicationNumber: string) {
       })).filter(i => i.cpcDate !== undefined),
       registersNumber: tableData[4].split('(')[0],
       registerDate: tableData[4].split('(')[1] !== undefined ? tableData[4].split('(')[1]?.replace(')', '').replace(/\./g, '-') : '',
-      astrtCont: document01.querySelector('p[num="0001a"]').innerText.replace(/\n/g, '').replace(/\;/g, '')
+      astrtCont: String(document01.querySelector('p[num="0001a"]').innerText.replace(/\n/g, '').replace(/\;/g, ''))
     }
-
+    
     // 인명정보
     const document02 = parse(html02)
     const applicants = [...document02.querySelector('.depth2_title').nextElementSibling.querySelectorAll('tbody tr')].map(i => {
@@ -216,7 +217,6 @@ async function getDataDetails(applicationNumber: string) {
       citating, citated,
       familyPatents
     }
-    sleep(500)
     return result
   } catch (err) {
     console.log(err)
@@ -226,18 +226,17 @@ async function getDataDetails(applicationNumber: string) {
 (async function() {
   const startDate = '20100101'
   const endDate = '20210131'
-  const fields = ['']
+  const fields = ['inventionTitle', 'applicationNumber', 'applicationDate', 'registerStatus', 'applicants', 'inventors', 'registerNumber', 'registerDate', 'astrtCont', 'ipcs', 'cpcs', 'claims', 'claimCount', 'citating', 'citated', 'familyPatents']
 
   const filePath = path.join(__dirname, '../../outputs', `${startDate}-${endDate}.csv`)
   const file = fs.createWriteStream(filePath, 'utf-8')
-  file.write(`${fields.join(',')}\n`)
+  file.write(`${fields.join('|')}\n`)
 
   const params = {
     startDate, endDate, filePath
   }
 
   const barl = new cliProgress.SingleBar({}, cliProgress.Presets.shades_grey)
-  
   const browser = await playwright.chromium.launch({
     headless: false
   })

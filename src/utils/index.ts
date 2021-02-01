@@ -2,6 +2,11 @@ export interface Indexable {
   [k: string]: any
 }
 
+export const promiseAllSleep = (milliseconds: number) => {
+    sleep(milliseconds)
+    return ''
+}
+
 export const sleep = (milliseconds: number) => {
     let start = new Date().getTime();
     for (let i = 0; i < 1e7; i++) {
@@ -9,6 +14,19 @@ export const sleep = (milliseconds: number) => {
             break;
         }
     }
+}
+
+
+export const promiseDelay = (t: number, val: null) => {
+    return new Promise(resolve => {
+        setTimeout(resolve.bind(null, val), t);
+    });
+}
+
+export const promiseRaceAll = (promises: any, timeoutTime: number, timeoutVal: null) => {
+    return Promise.all(promises.map((p: any) => {
+        return Promise.race([p, promiseDelay(timeoutTime, timeoutVal)])
+    }));
 }
 
 export const csvWriteStream = () => {
