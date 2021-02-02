@@ -16,21 +16,8 @@ export const sleep = (milliseconds: number) => {
     }
 }
 
-
-export const promiseDelay = (t: number, val: null) => {
-    return new Promise(resolve => {
-        setTimeout(resolve.bind(null, val), t);
-    });
-}
-
-export const promiseRaceAll = (promises: any, timeoutTime: number, timeoutVal: null) => {
-    return Promise.all(promises.map((p: any) => {
-        return Promise.race([p, promiseDelay(timeoutTime, timeoutVal)])
-    }));
-}
-
-export const csvWriteStream = () => {
-  // easier way
+export const csvWriteHeader = (fields: string[]) => {
+  return `${fields.join(';')}\n`
 }
 
 export const jsonWriteStream = () => {
