@@ -2,6 +2,8 @@
 
 ### Introduction
 
+#### Kipris
+
 - `POST  http://kpat.kipris.or.kr/kpat/searchLogina.do?next=MainSearch#page1`
 - 응답없음 => Chromium으로 추출
 ![](./docs/Kipris-01.png)
@@ -10,6 +12,9 @@
 - 응답있음 => html 파싱으로 추출
 ![](./docs/Kipris-01.png)
 
+#### DeepSearch
+
+- 출원인번호가 
 ### Installation & Execution
 
 ```sh
@@ -49,9 +54,10 @@ const obj = {
 
 ### Response
 
+#### 특허 데이터
 - 응답값 중 중첩된 데이터는 `JSON.stringify()`로 문자열로 직렬화된 채로 저장됨
 - 예시
-  ```js
+```js
   let result
   // as-is
   result = [
@@ -118,6 +124,32 @@ const obj = {
     "failyType": "패밀리타입"
   }]
 }
+```
+
+- csv 포맷으로는 다음과 같이 저장됨
+
+```csv
+inventionTitle;applicationNumber;applicationDate;registerStatus;applicants;inventors;registerNumber;registerDate;astrtCont;ipcs;cpcs;claims;claimCount;citating;citated;familyPatents
+전자발찌(Electronic anklets);2020200003518;2020-09-28;공개;[{"name":"권정수 KWON, JONG SOO","number":"419980221873","nationality":"대한민국","address":"서울특별시 강서구"}];[{"name":"권정수KWON, JONG SOO","number":"419980221873","nationality":"대한민국","address":"서울특별시 강서구"}];;;본 고안은 전자추적장치 등이 장착된 단말기의 양쪽 연결밴드가 결속기구에 의하여 착용자의 발목에 채울 수 있는 전자발찌에...;[];[{"ipcCode":"A44C 5/00","ipcDate":"2006-01-01"}];["전자추적장치 등이 장착된 단말기(1)의 양쪽 연결밴드(2)가 결속기구(10)에 형성된 기초판(100)의 고정핀(150)의 끝단에 눌림커버(200)의 결속유니트(210)가 눌려진..."];3;[{"nationality":"대한민국","publishNumber":"2003669220000 Y1","publishDate":"2004.11.10","inventionTitle":"신체구속용 결박밴드 ","ipcCode":" E05B 75/00 "}];;
+```
+#### 특허데이터 중 기업데이터
+
+- 응답값 중 중첩된 데이터는 `JSON.stringify()`로 문자열로 직렬화된 채로 저장됨
+- JSON으로는 따로 저장하지 않음
+
+```json
+```
+
+- csv 포맷으로는 다음과 같이 저장됨
+
+```csv
+registrationNumber;corporateNumber;repName;estDate
+["김명선","우리경"];2019-03-04;110111-7031068;797-81-01169
+["이규철"];2011-04-11;070-7456-2190;110111-4577081
+["문장덕"];1995-12-01;043-213-2087;150111-0044979
+["박지원","정연인"];1962-09-20;055-278-6114;194211-0000943
+["박정석"];2000-02-17;043-854-3560;151111-0014707
+["김재원"];;180111-0034974;608-81-16377
 ```
 
 ### Available Fields
