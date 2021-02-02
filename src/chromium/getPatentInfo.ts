@@ -277,9 +277,4 @@ export async function getPatentInfo () {
   const page = await context.newPage()
 
   await getList(page, barl, params)
-  
-  // const isExistFile = false
-  // if (isExistFile) {
-  //   await getCorpInfo(page, filePath)
-  // }
 }
