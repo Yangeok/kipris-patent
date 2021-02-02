@@ -57,22 +57,23 @@ const obj = {
 #### 특허 데이터
 - 응답값 중 중첩된 데이터는 `JSON.stringify()`로 문자열로 직렬화된 채로 저장됨
 - 예시
-```js
-  let result
-  // as-is
-  result = [
-    {
-      nationality: '일본',
-      publishNumber: '61144053 U',
-      publishDate: '1986.09.05',
-      inventionTitle: '뚜껑부 용기 ',
-      ipcCode: ' B65D 45/02 '
-    }
-  ]
 
-  // to-be
-  result = '[{"nationality":"일본","publishNumber":"61144053 U","publishDate":"1986.09.05","inventionTitle":"뚜껑부 용기 ","ipcCode":" B65D 45/02 "}]'
-  ```
+```js
+let result
+// as-is
+result = [
+  {
+    nationality: '일본',
+    publishNumber: '61144053 U',
+    publishDate: '1986.09.05',
+    inventionTitle: '뚜껑부 용기 ',
+    ipcCode: ' B65D 45/02 '
+  }
+]
+
+// to-be
+result = '[{"nationality":"일본","publishNumber":"61144053 U","publishDate":"1986.09.05","inventionTitle":"뚜껑부 용기 ","ipcCode":" B65D 45/02 "}]'
+```
 
 ```json
 {
@@ -114,7 +115,7 @@ const obj = {
   "citated": [{
     "publishNumber": "공보번호",
     "publishDate": "공보일자",
-    "inventionTitle": "발명이름",
+    "inventionTitle": "발 명이름",
     "ipcCode": "IPC 번호""publishNumbre"
   }],
   "familyPatents": [{
@@ -132,6 +133,16 @@ const obj = {
 inventionTitle;applicationNumber;applicationDate;registerStatus;applicants;inventors;registerNumber;registerDate;astrtCont;ipcs;cpcs;claims;claimCount;citating;citated;familyPatents
 전자발찌(Electronic anklets);2020200003518;2020-09-28;공개;[{"name":"권정수 KWON, JONG SOO","number":"419980221873","nationality":"대한민국","address":"서울특별시 강서구"}];[{"name":"권정수KWON, JONG SOO","number":"419980221873","nationality":"대한민국","address":"서울특별시 강서구"}];;;본 고안은 전자추적장치 등이 장착된 단말기의 양쪽 연결밴드가 결속기구에 의하여 착용자의 발목에 채울 수 있는 전자발찌에...;[];[{"ipcCode":"A44C 5/00","ipcDate":"2006-01-01"}];["전자추적장치 등이 장착된 단말기(1)의 양쪽 연결밴드(2)가 결속기구(10)에 형성된 기초판(100)의 고정핀(150)의 끝단에 눌림커버(200)의 결속유니트(210)가 눌려진..."];3;[{"nationality":"대한민국","publishNumber":"2003669220000 Y1","publishDate":"2004.11.10","inventionTitle":"신체구속용 결박밴드 ","ipcCode":" E05B 75/00 "}];;
 ```
+
+출원인코드 | 출원번호 | 출원일자 | 출원연도 | 발명의명칭 | 요약 | 청구항 | 청구항수 | 발명자명 | 발명자국적 | 등록번호 | 등록일자 | 최종처분내용 | CPC코드 | IPC코드 | 인용특허 | 피인용특허 | 패밀리특허
+--- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
+applicants[i].number | applicationNumber | applicationDate.substr(5, 9) | applicationDate | inventionTitle | astrtCont | claims[i] | claimCount | inventors[i].name | inventors[i].nationality | registerNumber | registerDate | registerStatus | cpcs[i].cpcCode | ipcs[i].ipcCode | citating[i] | citated[i] | familyPatents[i]
+520190449335 | 2020197000055 | 2019-05-17 | 2019 | 자력 흡착형 커넥터(MAGNETIC ATTRACTION CONNECTOR) | 본 고안은 커넥터 분야에 속하고, 특히 자력 흡착형 커넥터에 관한 것이다... | 자력 흡착형 커넥터이며, 상기 자력 흡착형 커넥터는 수컷 커넥터 및 암컷 커넥터를 포함하... | 16 | 쟝더후이 | | | | 공개 | | H01R 13/6205, H01R 24/60, H01R 31/06, H01R 2107/00 | H01R 13/62, H01R 24/60, H01R 31/06, H01R 107/00 | H01R 13/11, H01R 11/30, H01R 13/62 | | CN209029597, CN209592526
+419980221873 | 2020200003518 | 2020-09-28 | 2020 | 전자발찌(Electronic anklets) | 본 고안은 전자추적장치 등이 장착된 단말기의 양쪽 연결밴드가 결속기구에 의하여 착용자의 발목... | 전자추적장치 등이 장착된 단말기(1)의 양쪽 연결밴드(2)가 결속기구(10)에 형성된 기초판... | 3 | 권정수 | 대한민국 | | | 공개 | | | A44C 5/00, A44C 5/02, G08B 25/10, G08B 21/04 | E05B 75/00, G08B 21/18 | | |
+420120691454 | 2020200003518 | 2020-09-28 | 2020 | 전자발찌(Electronic anklets) | 본 고안은 전자추적장치 등이 장착된 단말기의 양쪽 연결밴드가 결속기구에 의하여 착용자의 발목... | 전자추적장치 등이 장착된 단말기(1)의 양쪽 연결밴드(2)가 결속기구(10)에 형성된 기초판... | 3 | 권민정 | 대한민국 | | | 공개 | | | A44C 5/00, A44C 5/02, G08B 25/10, G08B 21/04 | E05B 75/00, G08B 21/18 | | |
+420160076460 | 2020200003518 | 2020-09-28 | 2020 | 전자발찌(Electronic anklets) | 본 고안은 전자추적장치 등이 장착된 단말기의 양쪽 연결밴드가 결속기구에 의하여 착용자의 발목... | 전자추적장치 등이 장착된 단말기(1)의 양쪽 연결밴드(2)가 결속기구(10)에 형성된 기초판... | 3 | 권민석 | 대한민국 | | | 공개 | | | A44C 5/00, A44C 5/02, G08B 25/10, G08B 21/04 | E05B 75/00, G08B 21/18 | | |
+120190151227 | 2020200003478 | 2020-09-23 | 2020 | 젤네일 스티커 보관함(CASE FOR GELNAIL STICKER) | 본 고안은 젤네일 스티커 보관함에 관한 것으로, 바닥부, 벽부 및 개폐 가능한 덮개부를 포함하는 박... | 바닥부, 벽부 및 개폐 가능한 덮개부를 포함하는 박스부 상기 박스부의 바닥면에 설치되고, 절첩 구조로 형성되는 바디부 및... | 5 | 우리경 | | | | 공개 | | A45D 29/20, A45D 29/00, B65D 5/66, B65D 75/40 | B42D 1/08, A45D 29/20 | |
+
 #### 특허데이터 중 기업데이터
 
 - 응답값 중 중첩된 데이터는 `JSON.stringify()`로 문자열로 직렬화된 채로 저장됨
@@ -144,13 +155,21 @@ inventionTitle;applicationNumber;applicationDate;registerStatus;applicants;inven
 
 ```csv
 registrationNumber;corporateNumber;repName;estDate
-["김명선","우리경"];2019-03-04;110111-7031068;797-81-01169
-["이규철"];2011-04-11;070-7456-2190;110111-4577081
-["문장덕"];1995-12-01;043-213-2087;150111-0044979
-["박지원","정연인"];1962-09-20;055-278-6114;194211-0000943
-["박정석"];2000-02-17;043-854-3560;151111-0014707
-["김재원"];;180111-0034974;608-81-16377
+김명선,우리경;2019-03-04;110111-7031068;797-81-01169
+이규철;2011-04-11;070-7456-2190;110111-4577081
+문장덕;1995-12-01;043-213-2087;150111-0044979
+박지원,정연인;1962-09-20;055-278-6114;194211-0000943
+박정석;2000-02-17;043-854-3560;151111-0014707
+김재원;;180111-0034974;608-81-16377
 ```
+
+기업명 | 사업자번호 | 주소 | 출원인코드 | 출원인명 | 출원인국적 | 법인번호 | 대표자명 | 설립일자
+--- | --- | --- | --- | --- | --- | --- | --- | --- 
+corpName | businessNumber | address | applicantNumber | applicantName | applicantNationality | corpNumber | repName | estDate
+주식회사 미스터바우어 | 797-81-01169 | 서울 강남구 역삼1동 662-9번지 에프앤에프사옥 본관 2층 | 120190151227 | 주식회사 미스터바우어 | 대한민국 | 110111-7031068 | 김명선, 우리경 | 2019-03-04
+(주)케이디랩 | 206-86-52610 | 경기 안양시 동안구 관양2동 1802번지 평촌오비즈타워 B동 101호, 102호 | 120130080714 | (주)케이디랩 | 대한민국 | 206-86-52610 | 이규철 | 2011-04-11
+한빛이앤씨(주) | 301-81-41785 | 충북 청주시 청원구 북이면 광암리 169-3번지 | 120190479260 | 한빛이앤씨(주) | 대한민국 | 150111-0044979 | 문장덕 | 1995-12-01
+두산중공업(주) | 609-81-04684 | 경남 창원시 성산구 귀곡동 555-1번지 | 119980043286 | 두산중공업(주) | 대한민국 | 194211-0000943 | 박지원,정연인 | 1962-09-20
 
 ### Available Fields
 
