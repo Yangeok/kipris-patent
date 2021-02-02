@@ -14,7 +14,7 @@
 
 #### DeepSearch
 
-- 출원인번호가 
+- 출원인번호가 `1`로 시작하는 경우 딥서치에서 해당 출원인(기업)을 Chromium으로 추출
 ### Installation & Execution
 
 ```sh
