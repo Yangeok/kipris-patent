@@ -55,84 +55,11 @@ const obj = {
 ### Response
 
 #### 특허 데이터
-- 응답값 중 중첩된 데이터는 `JSON.stringify()`로 문자열로 직렬화된 채로 저장됨
-- 예시
 
-```js
-let result
-// as-is
-result = [
-  {
-    nationality: '일본',
-    publishNumber: '61144053 U',
-    publishDate: '1986.09.05',
-    inventionTitle: '뚜껑부 용기 ',
-    ipcCode: ' B65D 45/02 '
-  }
-]
-
-// to-be
-result = '[{"nationality":"일본","publishNumber":"61144053 U","publishDate":"1986.09.05","inventionTitle":"뚜껑부 용기 ","ipcCode":" B65D 45/02 "}]'
-```
-
-```json
-{
-  "inventionTitle": "발명이름",
-  "applicant": "출원인",
-  "applicationNumber": "출원번호",
-  "applicationDate": "출원일자",
-  "registerStatus": "등록상태",
-  "applicants": [{
-    "name": "출원자명", 
-    "number": "출원자번호",
-    "nationality": "국적",
-    "address": "주소"
-  }],
-  "inventors": [{
-    "name": "발명자명", 
-    "number": "발명자번호",
-    "nationality": "국적",
-    "address": "주소"
-  }],
-  "registerNumber": "등록번호",
-  "registerDate": "등록일자",
-  "astrtCont": "요약",
-  "ipcs": [{
-    "ipcCode": "IPC 번호", "ipcDate": "IPC 등록일"
-  }],
-  "cpcs": [{
-    "cpcCode": "CPC 번호", "cpcDate": "CPC 등록일"
-  }],
-  "claims": ["청구항"],
-  "claimCount": "청구항수",
-  "citating": [{
-    "nationality": "국적",
-    "publishNumber": "공보번호",
-    "publishDate": "공보일자",
-    "inventionTitle": "발명이름",
-    "ipcCode": "IPC 번호"
-  }],
-  "citated": [{
-    "publishNumber": "공보번호",
-    "publishDate": "공보일자",
-    "inventionTitle": "발 명이름",
-    "ipcCode": "IPC 번호""publishNumbre"
-  }],
-  "familyPatents": [{
-    "failyNumber": "패밀리이름", 
-    "nationalityCode": "국가코드", 
-    "nationality": "국적", 
-    "failyType": "패밀리타입"
-  }]
-}
-```
-
-- csv 포맷으로는 다음과 같이 저장됨
-
-```csv
-inventionTitle;applicationNumber;applicationDate;registerStatus;applicants;inventors;registerNumber;registerDate;astrtCont;ipcs;cpcs;claims;claimCount;citating;citated;familyPatents
-전자발찌(Electronic anklets);2020200003518;2020-09-28;공개;[{"name":"권정수 KWON, JONG SOO","number":"419980221873","nationality":"대한민국","address":"서울특별시 강서구"}];[{"name":"권정수KWON, JONG SOO","number":"419980221873","nationality":"대한민국","address":"서울특별시 강서구"}];;;본 고안은 전자추적장치 등이 장착된 단말기의 양쪽 연결밴드가 결속기구에 의하여 착용자의 발목에 채울 수 있는 전자발찌에...;[];[{"ipcCode":"A44C 5/00","ipcDate":"2006-01-01"}];["전자추적장치 등이 장착된 단말기(1)의 양쪽 연결밴드(2)가 결속기구(10)에 형성된 기초판(100)의 고정핀(150)의 끝단에 눌림커버(200)의 결속유니트(210)가 눌려진..."];3;[{"nationality":"대한민국","publishNumber":"2003669220000 Y1","publishDate":"2004.11.10","inventionTitle":"신체구속용 결박밴드 ","ipcCode":" E05B 75/00 "}];;
-```
+- `.csv` 파일로 나갈 예정이며, 구분자는 `;`로 사용했습니다.
+- 출원인코드, 발명자, 발명자국적이 복수인 경우 `,` 구분자로 구분했습니다.
+- CPC코드, IPC코드, 인용특허(IPC코드), 피인용특허(IPC코드), 패밀리특허(패밀리번호)이 복수인 경우 `,` 구분자로 구분했습니다.
+- 청구항은 복수 개의 데이터가 들어가므로 `["", "", ...]`의 형태로 배열로 묶었습니다. (청구항도 `,` 구분자로 변경할 예정)
 
 출원인코드 | 출원번호 | 출원일자 | 출원연도 | 발명의명칭 | 요약 | 청구항 | 청구항수 | 발명자명 | 발명자국적 | 등록번호 | 등록일자 | 최종처분내용 | CPC코드 | IPC코드 | 인용특허 | 피인용특허 | 패밀리특허
 --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
@@ -145,23 +72,8 @@ applicants[i].number | applicationNumber | applicationDate.substr(5, 9) | applic
 
 #### 특허데이터 중 기업데이터
 
-- 응답값 중 중첩된 데이터는 `JSON.stringify()`로 문자열로 직렬화된 채로 저장됨
-- JSON으로는 따로 저장하지 않음
-
-```json
-```
-
-- csv 포맷으로는 다음과 같이 저장됨
-
-```csv
-registrationNumber;corporateNumber;repName;estDate
-김명선,우리경;2019-03-04;110111-7031068;797-81-01169
-이규철;2011-04-11;070-7456-2190;110111-4577081
-문장덕;1995-12-01;043-213-2087;150111-0044979
-박지원,정연인;1962-09-20;055-278-6114;194211-0000943
-박정석;2000-02-17;043-854-3560;151111-0014707
-김재원;;180111-0034974;608-81-16377
-```
+- `.csv` 파일로 나갈 예정이며, 구분자는 `;`로 사용했습니다.
+- 대표자명이 복수인 경우 `,` 구분자로 구분했습니다.
 
 기업명 | 사업자번호 | 주소 | 출원인코드 | 출원인명 | 출원인국적 | 법인번호 | 대표자명 | 설립일자
 --- | --- | --- | --- | --- | --- | --- | --- | --- 
