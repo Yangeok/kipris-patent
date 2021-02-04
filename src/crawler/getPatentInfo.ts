@@ -10,7 +10,8 @@ import moment from 'moment'
 
 import { csvWriteHeader, Indexable, delayPromise, getURL } from '../utils'
 import { getProgressBar, getPlaywright } from '../middlewares'
-
+import { IBibliographic, IApplicant, IInventor, IIpc, ICpc, IClaim, ICitating, ICitated, IFamilyPatent, IApplicantNumber, IApplicationNumber } from '../interfaces'
+import { bibliographicFields, ipcFields, cpcFields, applicantFields, inventorFields, claimFields, citatingFields, citatedFields, familyPatentFields } from '../constants'
 
 const getBibliographic = (html: any) => {
   const newDocument = parse(html)
@@ -33,7 +34,6 @@ const getBibliographic = (html: any) => {
     // intlApplDate// 국제출원일자
     // intlPublishNumber// 국제공개번호
     // intlPublishDate// 국제공개일자
-    // priorityInfo// 우선권정보
     // // 심사진행상태
     // // 심판사항
     // // 특허구분
@@ -70,9 +70,6 @@ const getCpcs = (html: any) => {
     date: i.split('(')[1]?.replace(/\./g, '-')
   })).filter(i => i.date !== undefined)
   return cpcs
-}
-const getPriorities = (html: any) => {
-
 }
 const getApplicants = (html: any) => {
   const newDocument = parse(html)
@@ -244,7 +241,7 @@ async function getListData(page: Page, params: {
       citatedFields: params.citatedFields,
       familyPatentFields: params.familyPatentFields
     })
-    // TMP: 
+
     const result = {
       ...i,
       registersNumber: details?.bibliographic.registersNumber,
@@ -252,8 +249,11 @@ async function getListData(page: Page, params: {
       astrtCont: details?.bibliographic.astrtCont,
       claimsCount: details?.claims.length,
     }
-
     fs.appendFile(params.filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
+    // 서지정보
+    // 출원인
+    // 발명인
+    // 
     return result
   }, <any>Promise.resolve())
 }
@@ -319,7 +319,6 @@ async function getDataDetails(params: {
     const bibliographic = getBibliographic(html01)
     const ipcs = getIpcs(html01)
     const cpcs = getCpcs(html01)
-    const priorities = getPriorities(html01)
     
     // 인명정보
     const applicants = getApplicants(html02) // 출원인
@@ -348,7 +347,6 @@ async function getDataDetails(params: {
       bibliographic, // 서지정보
       ipcs, // IPC
       cpcs, // CPC
-      priorities, // 우선권정보
       applicants, // 출원인
       inventors, // 발명자
       claims, // 청구항
@@ -365,19 +363,19 @@ async function getDataDetails(params: {
 }
 
 export async function getPatentInfo ({ startDate, endDate }: { startDate: string, endDate: string }) {
-  const fields = ['inventionTitle', 'applicationNumber', 'applicationDate', 'registerStatus', 'applicants', 'inventors', 'registerNumber', 'registerDate', 'astrtCont', 'ipcs', 'cpcs', 'claims', 'claimCount', 'citating', 'citated', 'familyPatents']
-  const citatingFields = ['nationality', 'publishNumber', 'publishDate', 'inventionTitle', 'ipcCode']
-  const citatedFields = ['applicationNumber', 'applicationDate', 'inventionTitle', 'ipcCode']
-  const familyPatentFields = ['applcationNumber', 'failyNumber', 'nationalityCode', 'nationality', 'failyType']
-
   const filePath = path.join(__dirname, '../../outputs', `patent-${startDate}-${endDate}.csv`)
   const file = fs.createWriteStream(filePath, 'utf-8')
-  file.write(csvWriteHeader(fields))
+  file.write(csvWriteHeader(bibliographicFields))
 
   const params = {
     startDate, 
     endDate, 
     filePath, 
+    ipcFields,
+    cpcFields,
+    applicantFields,
+    inventorFields,
+    claimFields,
     citatingFields, 
     citatedFields, 
     familyPatentFields
