@@ -120,7 +120,15 @@ const getInventors = (html: any) => {
 const getClaims = (html: any) => {
   const newDocument = parse(html)
 
-  const claims = [...newDocument.querySelectorAll('tbody .txt_left')].map(i => i.innerText.replace(/\n/g, '').replace(/\t/g, '').replace(/  /g, '').replace(/\;/g, '')).filter(i => i !== '삭제')
+  const claims = [...newDocument.querySelectorAll('tbody .txt_left')]
+    .map(i => i.innerText
+      .replace(/\n/g, '')
+      .replace(/\t/g, '')
+      .replace(/  /g, '')
+      .replace(/\;/g, '')
+      .replace(/\,/g, '')
+    )
+    .filter(i => i !== '삭제')
   return claims
 }
 const getCitatingPatents = (html: any, header: string[]) => {
