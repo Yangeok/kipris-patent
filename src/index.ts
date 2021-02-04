@@ -1,6 +1,14 @@
-import { getCorpInfo, getPatentInfo } from './chromium'
+import moment from 'moment'
+import dotenv from 'dotenv'
+
+import { getCorpInfo, getPatentInfo } from './crawler'
+
+dotenv.config();
 
 (async function () {
-  // await getPatentInfo()
-  await getCorpInfo()
+  const startDate = '20200101'
+  const endDate = moment(new Date).format('YYYYMMDD')
+  
+  await getPatentInfo({ startDate, endDate })
+  // await getCorpInfo({ startDate, endDate })
 })()
