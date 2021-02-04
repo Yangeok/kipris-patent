@@ -76,10 +76,16 @@ const getPriorities = (html: any) => {
 }
 const getApplicants = (html: any) => {
   const newDocument = parse(html)
-  
+
   const applicantFields = ['applicationNumber', 'name', 'nationality', 'address']
   const applicants = [...newDocument.querySelector('.depth2_title').nextElementSibling.querySelectorAll('tbody tr')].map(i => {
-    const name = i.querySelector('.name').innerHTML.split('<br>').map(i => i.replace(/\n/g, '').replace(/  /g, '').replace(/	/g, '').replace(/[a-zA-Z]/g, '').replace(/\,/g, '')) 
+    const name = i.querySelector('.name').innerHTML.split('<br>').map(i => i
+      .replace(/\n/g, '')
+      .replace(/  /g, '')
+      .replace(/	/g, '')
+      .replace(/[a-zA-Z]/g, '')
+      .replace(/\,/g, '')
+    ) 
     
     return {
       applicationNumber: '',
@@ -95,18 +101,21 @@ const getInventors = (html: any) => {
   const newDocument = parse(html)
 
   const inventors = [...newDocument.querySelector('.depth2_title02').nextElementSibling.querySelectorAll('tbody tr')].map(i => {
-    const name = i.querySelector('.name').innerText.replace(/\n/g, '').replace(/\t/g, '')
-      .replace(/[a-zA-Z]/g, '').replace(/\,/g, '').replace(/  /g, '') // TMP: 
+    const name = i.querySelector('.name').innerText
+      .replace(/\n/g, '')
+      .replace(/\t/g, '')
+      .replace(/[a-zA-Z]/g, '')
+      .replace(/\,/g, '')
+      .replace(/  /g, '')
     
-    // TMP: 
-    return name.split('(')[0]
-    // return {
-    //   name: name.split('(')[0],
-    //   number: name.split('(')[1] !== undefined ? name.split('(')[1].replace(')', '') : '',
-    //   nationality: i.querySelector('.nationality').innerText,
-    //   address: i.querySelector('.txt_left').innerText.replace('...', '')
-    // }
-  }).join(', ')
+    return {
+      name: name.split('(')[0],
+      number: name.split('(')[1] !== undefined ? name.split('(')[1].replace(')', '') : '',
+      nationality: i.querySelector('.nationality').innerText,
+      address: i.querySelector('.txt_left').innerText.replace('...', '')
+    }
+  })
+  return inventors
 }
 const getClaims = (html: any) => {
   const newDocument = parse(html)
