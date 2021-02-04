@@ -79,9 +79,8 @@ const getPriorities = (html: any) => {
 }
 const getApplicants = (html: any) => {
   const newDocument = parse(html)
-  
+  const applicantFields = ['name', 'nationality', 'address']
   const applicants = [...newDocument.querySelector('.depth2_title').nextElementSibling.querySelectorAll('tbody tr')].map(i => {
-    // TODO: to remove!
     // const name = i.querySelector('.name').innerText.replace(/\n/g, '').replace(/\t/g, '')
     const name = i.querySelector('.name').innerHTML.split('<br>').map(i => i.replace(/\n/g, '').replace(/  /g, '').replace(/	/g, '')
       .replace(/[a-zA-Z]/g, '').replace(/\,/g, '') // TMP: 
@@ -130,8 +129,8 @@ const getCitatingPatents = (html: any, header: string[]) => {
     .map(i => [...i.querySelectorAll('td')]
       .map(j => j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, ''))) 
   const citating = citatingValues
-  .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))) : null)
-  ?.map(i => (i as any)?.ipcCode.substr(1, (i as any)?.ipcCode.length - 2))?.join(', ') // TMP: 
+  .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))) : '')
+
   return citating
 }
 const getCitatedPatents = (html: any, header: string[]) => {
@@ -141,21 +140,23 @@ const getCitatedPatents = (html: any, header: string[]) => {
     .map(i => [...i.querySelectorAll('td')]
       .map(j => j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, ''))) 
   const citated = citatedValues
-    .map(i => i.length > 1 ?fromEntries(i.map((j, index) => ([ header[index], j ]))): null)
-    ?.map(i => (i as any)?.ipcCode)?.join(', ') // TMP: 
+    .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))): '')
+
   return citated
 }
-const getFamilyPatents = (html: any, header: string[]) => {
+const getFamilyPatents = (html: any, header: string[], applicationNumber: string | number) => {
   const newDocument = parse(html)
     
   const familyPatents = [...new Set([...[...newDocument.querySelectorAll('.tstyle_list')]
     .map(i => [...i.querySelectorAll('tbody tr')])]
-    .map(i => i.map(j => [...j.querySelectorAll('td')].slice(1).map((k, idx) => idx === 0 ? k.innerText.trim() : k.innerText)))
+    .map(i => i
+      .map(j => [...j.querySelectorAll('td')]
+        .slice(1)
+        .map((k, idx) => idx === 0 ? k.innerText.trim() : k.innerText)))
     .reduce((acc, value) => acc.concat(value), []))]
-  // const familyPatentValues = [...newDocument.querySelectorAll('.tstyle_list')[1].querySelectorAll('tbody tr')].map(i => [...i.querySelectorAll('td')].slice(1).map(j => j.innerText.replace(/\n/g, '').replace(/\t/g, '')))
-  // const familyPatents = familyPatentValues
-  //   .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j]))) : null)
-  //   ?.map(i => i?.familyNumber)?.join(', ')
+    .filter(i => i.length)
+    .map(i => fromEntries(i.map((j, index) => ([ header[index], j]))))
+
   return familyPatents
 }
 
@@ -229,10 +230,6 @@ async function getListData(page: Page, params: {
     // TMP: 
     const result = {
       ...i,
-      applicants: details?.applicants,
-      inventors: details?.inventors,
-      // applicants: JSON.stringify(details?.applicants),
-      // inventors: JSON.stringify(details?.inventors),
       registersNumber: details?.bibliographic.registersNumber,
       registerDate: details?.bibliographic.registerDate,
       astrtCont: details?.bibliographic.astrtCont,
@@ -322,7 +319,7 @@ async function getDataDetails(params: {
     const citatedPatents = getCitatedPatents(html06, params.citatedFields) // 피인용
 
     // 패밀리정보
-    const familyPatents = getFamilyPatents(html07, params.familyPatentFields)
+    const familyPatents = getFamilyPatents(html07, params.familyPatentFields, params.applicationNumber)
     
     // 국가 R&D 연구정보 
     // const document08 = parse(html08)
@@ -339,6 +336,8 @@ async function getDataDetails(params: {
       citatedPatents, // 피인용특허
       familyPatents // 패밀리특허
     }
+
+    console.log(result)
     return result
   } catch (err) {
     console.log(err)
@@ -349,7 +348,7 @@ export async function getPatentInfo ({ startDate, endDate }: { startDate: string
   const fields = ['inventionTitle', 'applicationNumber', 'applicationDate', 'registerStatus', 'applicants', 'inventors', 'registerNumber', 'registerDate', 'astrtCont', 'ipcs', 'cpcs', 'claims', 'claimCount', 'citating', 'citated', 'familyPatents']
   const citatingFields = ['nationality', 'publishNumber', 'publishDate', 'inventionTitle', 'ipcCode']
   const citatedFields = ['applicationNumber', 'applicationDate', 'inventionTitle', 'ipcCode']
-  const familyPatentFields = ['failyNumber', 'nationalityCode', 'nationality', 'failyType']
+  const familyPatentFields = ['applcationNumber', 'failyNumber', 'nationalityCode', 'nationality', 'failyType']
 
   const filePath = path.join(__dirname, '../../outputs', `patent-${startDate}-${endDate}.csv`)
   const file = fs.createWriteStream(filePath, 'utf-8')
