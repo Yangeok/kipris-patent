@@ -24,25 +24,21 @@ const getBibliographic = (html: any) => {
   const bibliographic = {
     registersNumber: tableData[4].split('(')[0], // 등록번호
     registerDate: tableData[4].split('(')[1] !== undefined ? tableData[4].split('(')[1]?.replace(')', '').replace(/\./g, '-') : '', // 등록일자
-    // 공개번호
-    // 공개일자
-    // 공고번호
-    // 공고일자
-    // 국제출원번호
-    // 국제출원일자
-    // 국제공개번호
-    // 국제공개일자
-    // 우선권정보
-    // 법적상태
-    // 심사진행상태
-    // 심판사항
-    // 특허구분
-    // 원출원번호
-    // 원출원일자
-    // 관련출원번호
-    // 기술이전희망여부
-    // 심사청구여부
-    // 심사청구일자
+    // TODO: 
+    // publishNumber// 공개번호
+    // publishDate// 공개일자
+    // // 공고번호
+    // // 공고일자
+    // intlApplNumber// 국제출원번호
+    // intlApplDate// 국제출원일자
+    // intlPublishNumber// 국제공개번호
+    // intlPublishDate// 국제공개일자
+    // priorityInfo// 우선권정보
+    // // 심사진행상태
+    // // 심판사항
+    // // 특허구분
+    // // 기술이전희망여부
+    // claimReqDate// 심사청구일자
     astrtCont: String(newDocument.querySelector('p[num="0001a"]').innerText.replace(/\n/g, '').replace(/\;/g, '')) // 요약
   }
   return bibliographic
@@ -80,25 +76,20 @@ const getPriorities = (html: any) => {
 }
 const getApplicants = (html: any) => {
   const newDocument = parse(html)
-  const applicantFields = ['name', 'nationality', 'address']
+  
+  const applicantFields = ['applicationNumber', 'name', 'nationality', 'address']
   const applicants = [...newDocument.querySelector('.depth2_title').nextElementSibling.querySelectorAll('tbody tr')].map(i => {
-    // const name = i.querySelector('.name').innerText.replace(/\n/g, '').replace(/\t/g, '')
-    const name = i.querySelector('.name').innerHTML.split('<br>').map(i => i.replace(/\n/g, '').replace(/  /g, '').replace(/	/g, '')
-      .replace(/[a-zA-Z]/g, '').replace(/\,/g, '') // TMP: 
-    ) 
+    const name = i.querySelector('.name').innerHTML.split('<br>').map(i => i.replace(/\n/g, '').replace(/  /g, '').replace(/	/g, '').replace(/[a-zA-Z]/g, '').replace(/\,/g, '')) 
     
-    // TMP:
-    return name[0].substr(0, name[0].length - 1)
-    // return {
-    //   name: name[0].substr(0, name[0].length - 1),
-    //   number: name[2].replace(/[^0-9]/g, ''),
-    //   // TODO: to remove!
-    //   // name: name.split('(')[0],
-    //   // number: name.split('(')[1] !== undefined ? name.split('(')[1].replace(')', '') : '',
-    //   nationality: i.querySelector('.nationality').innerText,
-    //   address: i.querySelector('.txt_left').innerText.replace('...', '')
-    // }
-  }).join(', ') // TMP:
+    return {
+      applicationNumber: '',
+      name: name[0].substr(0, name[0].length - 1),
+      number: name[2].replace(/[^0-9]/g, ''),
+      nationality: i.querySelector('.nationality').innerText,
+      address: i.querySelector('.txt_left').innerText.replace('...', '')
+    }
+  })
+  return applicants
 }
 const getInventors = (html: any) => {
   const newDocument = parse(html)
