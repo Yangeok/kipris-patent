@@ -1,4 +1,4 @@
-export const delayPromise = (value: any, milliseconds: number): Promise<any> => {
+export const delayPromise = <T>(value: T, milliseconds: number): Promise<T> => {
   return new Promise(resolve => setTimeout(resolve, milliseconds, value))
 }
 
