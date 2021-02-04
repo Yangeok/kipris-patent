@@ -6,6 +6,7 @@ import { Page } from 'playwright'
 import * as path from 'path'
 import axios from 'axios'
 import * as fs from 'fs'
+import moment from 'moment'
 
 import { csvWriteHeader, Indexable, delayPromise, getURL } from '../utils'
 import { getProgressBar, getPlaywright } from '../middlewares'
@@ -127,9 +128,13 @@ const getCitatingPatents = (html: any, header: string[]) => {
   
   const citatingValues = [...[...newDocument.querySelectorAll('.tstyle_list')][0].querySelectorAll('tbody tr')]
     .map(i => [...i.querySelectorAll('td')]
-      .map(j => j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, ''))) 
+      .map((j, idx) => 
+        idx === 2
+        ? j.innerText.replace(/\./g, '-')
+        : j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, '')
+      ))
   const citating = citatingValues
-  .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))) : '')
+  .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))) : undefined)
 
   return citating
 }
@@ -138,9 +143,13 @@ const getCitatedPatents = (html: any, header: string[]) => {
   
   const citatedValues  = [...[...newDocument.querySelectorAll('.tstyle_list')][1].querySelectorAll('tbody tr')]
     .map(i => [...i.querySelectorAll('td')]
-      .map(j => j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, ''))) 
+      .map((j, idx) => 
+        idx === 1
+        ? j.innerText.replace(/\./g, '-')
+        : j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, '')
+      ))
   const citated = citatedValues
-    .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))): '')
+    .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))): undefined)
 
   return citated
 }
@@ -269,7 +278,10 @@ async function getDataDetails(params: {
   const baseUrl = 'http://kpat.kipris.or.kr/kpat/biblioa.do?'
   const urlParams = [
     ['method', 'biblioMain_biblio'],
-    ['applno', params.applicationNumber],
+    // ['applno', params.applicationNumber],
+    // ['applno', '2020180005507'], // TMP: 패밀리특허
+    // ['applno', '2020190004255'], // TMP: 인용특허
+    ['applno', '2020190000436'], // TMP: 피인용특허
     ['link', 'N']
   ]
   const url = getURL(baseUrl, urlParams)
