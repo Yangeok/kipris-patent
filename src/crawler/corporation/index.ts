@@ -1,13 +1,13 @@
 import { SingleBar } from 'cli-progress'
 import { Page } from 'playwright'
-import * as path from 'path'
+import path from 'path'
 import csv from 'csvtojson'
-import * as fs from 'fs'
+import fs from 'fs'
 
-import { csvWriteHeader } from '../utils';
-import { getPlaywright, getProgressBar } from '../middlewares'
-import { ICorpOutline, ICorpMarket, ICorpFinance, ICorpNumber } from '../interfaces'
-import { corpFiles, corpOutlineFields, corpMarketFields, corpFinanceFields} from '../constants'
+import { csvWriteHeader } from '../../utils'
+import { getPlaywright, getProgressBar } from '../../middlewares'
+import { ICorpOutline, ICorpMarket, ICorpFinance, ICorpNumber } from '../../interfaces'
+import { corpFiles, corpOutlineFields, corpMarketFields, corpFinanceFields} from '../../constants'
 
 const username = process.env.DS_USERNAME as string
 const password = process.env.DS_PASSWORD as string
@@ -66,8 +66,8 @@ async function getList(page: Page, barl: SingleBar, params: {
   // 검색결과 슬라이싱
   await page.waitForTimeout(5000)
 
-  const details = getCorpDetailInfo(page)
-  const financials = getCorpFinancialInfo(page)
+  const details = await getCorpDetailInfo(page)
+  const financials = await getCorpFinancialInfo(page)
 
   return { details, financials }
 }

@@ -11,7 +11,7 @@ import moment from 'moment'
 import { csvWriteHeader, Indexable, delayPromise, getURL } from '../utils'
 import { getProgressBar, getPlaywright } from '../middlewares'
 import { IBibliographic, IApplicant, IInventor, IIpc, ICpc, IClaim, ICitating, ICitated, IFamilyPatent, IApplicantNumber, IApplicationNumber } from '../interfaces'
-import { bibliographicFields, ipcFields, cpcFields, applicantFields, inventorFields, claimFields, citatingFields, citatedFields, familyPatentFields } from '../constants'
+import { patentFiles, bibliographicFields, ipcFields, cpcFields, applicantFields, inventorFields, claimFields, citatingFields, citatedFields, familyPatentFields } from '../constants'
 
 const getBibliographic = (html: any) => {
   const newDocument = parse(html)
@@ -249,6 +249,8 @@ async function getListData(page: Page, params: {
       astrtCont: details?.bibliographic.astrtCont,
       claimsCount: details?.claims.length,
     }
+
+    // TODO: 여기서 파일 저장하는게 맞아보임
     fs.appendFile(params.filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
     // 서지정보
     // 출원인
@@ -366,6 +368,8 @@ export async function getPatentInfo ({ startDate, endDate }: { startDate: string
   const filePath = path.join(__dirname, '../../outputs', `patent-${startDate}-${endDate}.csv`)
   const file = fs.createWriteStream(filePath, 'utf-8')
   file.write(csvWriteHeader(bibliographicFields))
+
+  // 파일 저장하는 방법 생각하기
 
   const params = {
     startDate, 
