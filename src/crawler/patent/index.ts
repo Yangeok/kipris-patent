@@ -68,8 +68,8 @@ async function getListData(page: Page, params: {
     citatingFields: Array<keyof ICitating>,
     citatedFields: Array<keyof ICitated>,
     familyPatentFields: Array<keyof IFamilyPatent>
-  }
-}) {
+  },
+}, isOneFile = true) {
   await page.waitForSelector('.search_section')
   
   // 요약 리스트 수집
@@ -83,13 +83,29 @@ async function getListData(page: Page, params: {
       familyPatentFields: params.fields.familyPatentFields
     })
 
+    if (isOneFile) {
+      const result = {
+        ...i,
+        ...details?.bibliographic,
+        applicants: JSON.stringify(details?.applicants),
+        inventors: JSON.stringify(details?.inventors),
+        claims: JSON.stringify(details?.claims),
+        citatingPatents: JSON.stringify(details?.citatingPatents),
+        citatedPatents: JSON.stringify(details?.citatedPatents),
+        familyPatents: JSON.stringify(details?.familyPatents)
+      } as IBibliographic
+
+      fs.appendFile(params.files[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
+      
+      return result
+    }
+
     const result = {
       ...i,
       ...details?.bibliographic,
     } as IBibliographic
     
     // 출원인
-    // if (details.applicants.number.charAt(0) === '1')
     const applicants = details?.applicants.map(i => Object.values(i).join(';')).join('\n') as string
     fs.appendFile(params.files.filter(i => i.name === 'patent-applicant')[0].filePath, applicants + '\n', err => err && console.log(`> saving file err`))
     
@@ -106,7 +122,6 @@ async function getListData(page: Page, params: {
     
     // 인용 특허
     const citating = details?.citatingPatents[0] !== '' ? details?.citatingPatents.map(i => Object.values((<any>i)).join(';')).join('\n') + '\n' as string : undefined
-    console.log({citating}, citating !== undefined ? citating + '\n' : '')
     fs.appendFile(params.files.filter(i => i.name === 'patent-citating')[0].filePath, citating !== undefined ? citating : '', err => err && console.log(`> saving file err`))
     
     // 피인용 특허
@@ -158,9 +173,10 @@ async function getDataDetails(params: {
     ['link', 'N']
   ]
   const url = getURL(baseUrl, urlParams)
+  console.log('#@# url: ', url)
 
   try {
-    const { data: html02 } = await axios.get(`${url}&next=biblioViewSub02&getType=Sub02`)
+    const [{ data: html02 }] = await Promise.all([await axios.get(`${url}&next=biblioViewSub02&getType=Sub02`)])
 
     // 인명정보
     const applicants = getApplicants(html02) // 출원인
@@ -227,7 +243,7 @@ async function getDataDetails(params: {
         familyPatents // 패밀리특허
       }
 
-      console.log(result)
+      // console.log(result)
       return result
     }
     return 
@@ -248,6 +264,7 @@ export async function getPatentInfo ({ startDate, endDate }: { startDate: string
       name: i.name
     }
   })
+
   const fields = {
     citatingFields, 
     citatedFields, 
