@@ -19,6 +19,13 @@ export interface IBibliographic extends IApplicationNumber {
   claimReqDate: string | Date
   claimCount: string | number
   astrtCont: string
+
+  applicants?: string // json
+  inventors?: string // json
+  claims?: string // json
+  citatingPatents?: string // json
+  citatedPatents?: string // json
+  familyPatents?: string // json
 }
 export interface IApplicantNumber {
   applicantNumber: string | number
