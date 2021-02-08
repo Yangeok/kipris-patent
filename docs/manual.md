@@ -1,64 +1,163 @@
-## 데이터
 
-### 특허데이터
 
-- `.csv` 파일로 나갈 예정이며, 구분자는 `;`로 사용했습니다.
-- 출원인코드, 발명자, 발명자국적이 복수인 경우 `,` 구분자로 구분했습니다.
-- CPC코드, IPC코드, 인용특허(IPC코드), 피인용특허(IPC코드), 패밀리특허(패밀리번호)이 복수인 경우 `,` 구분자로 구분했습니다.
-- 청구항은 복수 개의 데이터가 들어가므로 `["", "", ...]`의 형태로 배열로 묶었습니다. (청구항도 `,` 구분자로 변경할 예정)
+## 특허 데이터 필드 설명
 
-출원인코드 | 출원번호 | 출원일자 | 출원연도 | 발명의명칭 | 요약 | 청구항 | 청구항수 | 발명자명() | 발명자국적 | 등록번호 | 등록일자 | 최종처분내용 | CPC코드 | IPC코드 | 인용특허(IPC코드) | 피인용특허(IPC코드) | 패밀리특허(패밀리번호)
---- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
-applicants | applicationNumber | applicationDate | applicationDate | inventionTitle | astrtCont | claims[i] | claimCount | inventors | inventors[i].nationality | registerNumber | registerDate | registerStatus | cpcs | ipcs | citating | citated | familyPatents
-520190449335 | 2020197000055 | 2019-05-17 | 2019 | 자력 흡착형 커넥터(MAGNETIC ATTRACTION CONNECTOR) | 본 고안은 커넥터 분야에 속하고, 특히 자력 흡착형 커넥터에 관한 것이다... | 자력 흡착형 커넥터이며, 상기 자력 흡착형 커넥터는 수컷 커넥터 및 암컷 커넥터를 포함하... | 16 | 쟝더후이 | | | | 공개 | | H01R 13/6205, H01R 24/60, H01R 31/06, H01R 2107/00 | H01R 13/62, H01R 24/60, H01R 31/06, H01R 107/00 | H01R 13/11, H01R 11/30, H01R 13/62 | | CN209029597, CN209592526
-419980221873, 420120691454, 420160076460 | 2020200003518 | 2020-09-28 | 2020 | 전자발찌(Electronic anklets) | 본 고안은 전자추적장치 등이 장착된 단말기의 양쪽 연결밴드가 결속기구에 의하여 착용자의 발목... | 전자추적장치 등이 장착된 단말기(1)의 양쪽 연결밴드(2)가 결속기구(10)에 형성된 기초판... | 3 | 권정수, 권민정, 권민석 | 대한민국, 대한민국, 대한민국 | | | 공개 | | | A44C 5/00, A44C 5/02, G08B 25/10, G08B 21/04 | E05B 75/00, G08B 21/18 | | |
-120190151227 | 2020200003478 | 2020-09-23 | 2020 | 젤네일 스티커 보관함(CASE FOR GELNAIL STICKER) | 본 고안은 젤네일 스티커 보관함에 관한 것으로, 바닥부, 벽부 및 개폐 가능한 덮개부를 포함하는 박... | 바닥부, 벽부 및 개폐 가능한 덮개부를 포함하는 박스부 상기 박스부의 바닥면에 설치되고, 절첩 구조로 형성되는 바디부 및... | 5 | 우리경 | | | | 공개 | | A45D 29/20, A45D 29/00, B65D 5/66, B65D 75/40 | B42D 1/08, A45D 29/20 | |
+### Way 1 - 원파일 제공
 
-### 특허데이터 중 기업데이터
+- 어미가 `*s`인 변수는 복수 개의 데이터를 의미합니다.
+- 복수 개의 데이터를 담은 필드는 문자열 처리한 json 포맷입니다.
+- python에서 사용하시려면 json을 파싱하신 후에 사용해주세요.
 
-- `.csv` 파일로 나갈 예정이며, 구분자는 `;`로 사용했습니다.
-- 대표자명이 복수인 경우 `,` 구분자로 구분했습니다.
+- 파일명 컨벤션: `patent_<start_date>_<end_date>.csv`
+- applicationNumber: 출원번호 (기본키)
+- inventionTitle: 발명명
+- applicationDate: 출원일자
+- registerStatus: 등록상태
+- registerNumber: 등록번호
+- registerDate: 등록일자
+- publishNumber: 공개번호
+- publishDate: 공개일자
+- intlApplNumber: 국제출원번호
+- intlApplDate: 국제출원일자
+- intlPublishNumber: 국제공개번호
+- intlPublishDate: 국제공개일자
+- claimReqDate: 청구일자
+- claimCount: 청구항수
+- astrtCont: 요약
+- applicants: 출원인 (json 타입)
+  - name: 출원인명
+  - nationality: 출원인국적
+  - address: 출원인주소
+- inventors: 발명인 (json 타입)
+  - name: 발명인명
+  - number: 발명인번호
+  - nationality: 발명인국적
+  - address: 발명인주소
+- claims: 청구항 (json 타입)
+  - claimDescription: 청구항설명
+- citatingPatents: 인용특허 (json 타입)
+  - nationality: 국적
+  - publishNumber: 공보번호
+  - publishDate: 공보일자
+  - inventionTitle: 발명명
+  - ipcCode: IPC코드
+- citatedPatents: 피인용특허 (json 타입)
+  - applicationDate: 출원일자
+  - inventionTitle: 발명명
+  - ipcCode: IPC코드
+- familyPatents: 패밀리특허 (json 타입)
+  - number: 패밀리번호
+  - nationalityCode: 국가코드
+  - nationality: 패밀러특허국적
+  - type: 패밀리타입
+### Way 2 - 파일 분리 제공
+#### 서지정보
 
-기업명 | 사업자번호 | 주소 | 출원인코드 | 출원인명 | 출원인국적 | 법인번호 | 대표자명 | 설립일자
---- | --- | --- | --- | --- | --- | --- | --- | --- 
-corpName | businessNumber | address | applicantNumber | applicantName | applicantNationality | corpNumber | repName | estDate
-주식회사 미스터바우어 | 797-81-01169 | 서울 강남구 역삼1동 662-9번지 에프앤에프사옥 본관 2층 | 120190151227 | 주식회사 미스터바우어 | 대한민국 | 110111-7031068 | 김명선, 우리경 | 2019-03-04
-(주)케이디랩 | 206-86-52610 | 경기 안양시 동안구 관양2동 1802번지 평촌오비즈타워 B동 101호, 102호 | 120130080714 | (주)케이디랩 | 대한민국 | 206-86-52610 | 이규철 | 2011-04-11
-한빛이앤씨(주) | 301-81-41785 | 충북 청주시 청원구 북이면 광암리 169-3번지 | 120190479260 | 한빛이앤씨(주) | 대한민국 | 150111-0044979 | 문장덕 | 1995-12-01
-두산중공업(주) | 609-81-04684 | 경남 창원시 성산구 귀곡동 555-1번지 | 119980043286 | 두산중공업(주) | 대한민국 | 194211-0000943 | 박지원,정연인 | 1962-09-20
+- 파일명 컨벤션: `patent_bibliographic_<start_date>_<end_date>.csv`
+
+- applicationNumber: 출원번호 (기본키)
+- inventionTitle: 발명명
+- applicationDate: 출원일자
+- registerStatus: 등록상태
+- registerNumber: 등록번호
+- registerDate: 등록일자
+- publishNumber: 공개번호
+- publishDate: 공개일자
+- intlApplNumber: 국제출원번호
+- intlApplDate: 국제출원일자
+- intlPublishNumber: 국제공개번호
+- intlPublishDate: 국제공개일자
+- claimReqDate: 청구일자
+- claimCount: 청구항수
+- astrtCont: 요약
+#### 출원인
+
+- 파일명 컨벤션: `patent_applicant_<start_date>_<end_date>.csv`
+- applicationNumber: 출원번호 (참조키)
+- name: 출원인명
+- nationality: 출원인국적
+- address: 출원인주소
+#### 발명인
+
+- 파일명 컨벤션: `patent_inventor_<start_date>_<end_date>.csv`
+- applicationNumber: 출원번호 (참조키)
+- name: 발명인명
+- number: 발명인번호
+- nationality: 발명인국적
+- address: 발명인주소
+#### 청구항
+- 파일명 컨벤션: `patent_claim_<start_date>_<end_date>.csv`
+- applicationNumber: 출원번호 (참조키)
+- description: 청구항설명
+
+#### 인용 특허
+- 파일명 컨벤션: `patent_citating_<start_date>_<end_date>.csv`
+- applicationNumber: 출원번호 (참조키)
+- nationality: 국적
+- publishNumber: 공보번호
+- publishDate: 공보일자
+- inventionTitle: 발명명
+- ipcCode: IPC코드
+
+#### 피인용 특허
+- 파일명 컨벤션: `patent_citated_<start_date>_<end_date>.csv`
+- applicationNumber: 출원번호 (참조키)
+- applicationDate: 출원일자
+- inventionTitle: 발명명
+- ipcCode: IPC코드
+
+#### 패밀리 특허
+- 파일명 컨벤션: `patent_family_<start_date>_<end_date>.csv`
+- applicationNumber: 출원번호 (참조키) 
+- number: 패밀리번호
+- nationalityCode: 국가코드
+- nationality: 패밀러특허국적
+- type: 패밀리타입
+
+## 기업 데이터 필드 설명
+
+### 파일 분리
+### 기업 개요
+- 파일명 컨벤션: `corp_outline_<start_date>_<end_date>.csv`
+- applicantNumber: 출원인번호 (참조키)
+- corpNumber: 법인번호 (기본키)
+- businessNumber: 사업자등록번호
+- repName: 대표자명
+- estDate: 설립일자
+- address: 주소
+- corpName: 법인명
+- corpScale: 법인규모
+- corpForm: 법인형태
+- indCat: 산업분류
+- nationality: 법인국적
+- isExtAudit: 외감여부
+- isClose: 폐업여부
+- isPublic: 상장여부
+
+### 기업 재무
+- 파일명 컨벤션: `corp_finance_<start_date>_<end_date>.csv`
+- corpNumber: 법인번호 (참조키)
+- totalSales: 시가총액
+- bizProfits: 매출액
+- crtmNetIncome: 당기순이익
+- assets: 자산
+- liabilities: 부채
+- capital: 자본
+- roe: 자기자본이익률
+- employees: 종업원수
 
 ## 추가 가능한 정보
 
 ### 특허데이터
 
-- 공개번호
-- 공개일자
 - 공고번호
 - 공고일자
-- 국제출원번호
-- 국제출원일자
-- 국제공개번호
-- 국제공개일자
-- 법적상태
-- 심사진행상태
 - 심판사항
 - 특허구분
 - 원출원번호
 - 원출원일자
 - 관련 출원번호
 - 기술이전 희망
-- 심사청구여부
-- 심사청구일자
-- 출원인
-  - 출원번호
-  - 이름
-  - 국적
-  - 주소
-- 발명인
-  - 출원번호
-  - 이름
-  - 국적
-  - 주소
 - 대리인
   - 출원번호
   - 이름
@@ -81,25 +180,6 @@ corpName | businessNumber | address | applicantNumber | applicantName | applican
   - 출원번호
   - 구분
   - 국가명
-- 인용특허
-  - 출원번호
-  - 국가
-  - 공보번호
-  - 공보일자
-  - 발명의명칭
-  - IPC코드
-- 피인용특허
-  - 원출원번호
-  - 출원번호
-  - 출원일자
-  - 발명의명칭
-  - IPC코드
-- 패밀리정보
-  - 출원번호
-  - 패밀리번호
-  - 국가코드
-  - 국가명
-  - 종류
 - 국가 R&D 연구정보
   - 출원번호
   - 연구부처
@@ -110,31 +190,11 @@ corpName | businessNumber | address | applicantNumber | applicantName | applican
 ### 기업데이터
 
 - 딥서치
-  - 기업명
-  - 법인등록번호
-  - 대표이사
-  - 설립일자
-  - 기업형태
-  - 기업규모
-  - 상장여부
-  - 외감여부
-  - 폐업여부
-  - 산업분류
   - 홈페이지
   - 전화번호
-  - 사업자등록번호
-  - 주소
   - 주거래은행
-  - 사업영역
   - 관련주제
-  - 매출액
-  - 영업이익
-  - 당기순이익
-  - 자산
-  - 부채
-  - 자본
-  - 종업원수
-
+  
 - 공공데이터포털 (예정)
   - 요약재무제표조회
     - 법인등록번호
