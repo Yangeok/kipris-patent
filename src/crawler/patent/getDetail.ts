@@ -1,5 +1,6 @@
 import { parse } from 'node-html-parser'
 import fromEntries from 'fromentries'
+import { ICitating } from '../../interfaces'
 
 export const getBibliographic = (html: any) => {
   const newDocument = parse(html)
@@ -9,26 +10,23 @@ export const getBibliographic = (html: any) => {
     ? i.nextElementSibling.innerText.replace(/\n/g, '').replace(/\t/g, '').replace(/  /g, '')
     : i.nextSibling.textContent.replace(/\n/g, '').replace(/\s/g, '')
   )
-
   const bibliographic = {
     registerNumber: tableData[4].split('(')[0], // 등록번호
     registerDate: tableData[4].split('(')[1] !== undefined ? tableData[4].split('(')[1]?.replace(')', '').replace(/\./g, '-') : '', // 등록일자
-    publishNumber: tableData[5].split('(')[0], // 공개번호
-    publishDate: tableData[5].split('(')[1] !== undefined ? tableData[5].split('(')[1]?.replace(')', '').replace(/\./g, '-') : '', // 공개일자
-    // publishNumber: [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1] !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[0].replace(/\n/g, '').replace(/\t/g, '').replace(/[^0-9]/g, '') : '', // 공개번호
-    // publishDate: [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1] !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1].replace(/\./g, '-').replace(')', '').replace(/\n/g, '').replace(/\t/g, ''): '', // 공개일자
+    publishNumber: [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1] !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[0].replace(/\n/g, '').replace(/\t/g, '').replace(/[^0-9]/g, '') : '', // 공개번호
+    publishDate: [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1] !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1].replace(/\./g, '-').replace(')', '').replace(/\n/g, '').replace(/\t/g, '').replace(/  /g, '') : '', // 공개일자
     // 공고번호
     // 공고일자
-    intlApplNumber: tableData[8].split('(')[0] !== undefined ? tableData[8].split('(')[0]: '', // 국제출원번호
-    intlApplDate: tableData[8].split('(')[1] !== undefined ? tableData[8].split('(')[1]?.replace(/\./g, '-').replace(')', '') : '', // 국제출원일자
-    intlPublishNumber: tableData[9].split('(')[0], // 국제공개번호
-    intlPublishDate: tableData[9].split('(')[1] !== undefined ? tableData[9].split('(')[1].replace(/\./g, '-').replace(')', '') : '', // 국제공개일자
+    intlApplNumber: tableData[7].split('(')[0] !== undefined ? tableData[8].split('(')[0]: '', // 국제출원번호
+    intlApplDate: tableData[7].split('(')[1] !== undefined ? tableData[8].split('(')[1]?.replace(/\./g, '-').replace(')', '') : '', // 국제출원일자
+    intlPublishNumber: tableData[8], // 국제공개번호
+    intlPublishDate: tableData[8].split('(')[1] !== undefined ? tableData[8].split('(')[1].replace(/\./g, '-').replace(')', '') : '', // 국제공개일자
     // 심사진행상태
     // 심판사항
     // 특허구분
     // 기술이전희망여부
-    claimReqDate: tableData[18].split('(')[1] !== undefined ? tableData[18].split('(')[1].replace(/\./g, '-').replace(')', '') : '',// 심사청구일자
-    claimCount: tableData[19] !== undefined ? tableData[19].replace(/\t/g, '').replace(/\n/g, ''): '', // 청구항수
+    claimReqDate: tableData[17].split('(')[1] !== undefined ? tableData[17].split('(')[1].replace(/\./g, '-').replace(')', '') : '',// 심사청구일자
+    claimCount: tableData[18] !== undefined ? tableData[18].replace(/\t/g, '').replace(/\n/g, ''): '', // 청구항수
     astrtCont: String(newDocument.querySelector('p[num="0001a"]').innerText.replace(/\n/g, '').replace(/\;/g, '')) // 요약
   }
   return bibliographic
@@ -119,17 +117,25 @@ export const getClaims = (html: any) => {
 }
 export const getCitatingPatents = (html: any, header: string[]) => {
   const newDocument = parse(html)
-  
+
   const citatingValues = [...[...newDocument.querySelectorAll('.tstyle_list')][0].querySelectorAll('tbody tr')]
     .map(i => [...i.querySelectorAll('td')]
-      .map((j, idx) => 
-        idx === 2
-        ? j.innerText.replace(/\./g, '-')
-        : j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, '')
-      ))
+      .map((j, idx) => {
+        if (idx === 2) {
+          return j.innerText.replace(/\./g, '-')
+        }
+        if (idx === 3) {
+          return j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, '').substr(0, j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, '').length - 1)  
+        }
+        if (idx === 4) {
+          return j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, '').substr(1, j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, '').length - 1)  
+        }
+
+        return j.innerText.replace(/\n/g, '').replace(/  /g, '').replace(/\t/g, '')
+      }))
   const citating = citatingValues
-  .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))) : '')
-  
+    .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))) : '')
+
   return citating[0] !== '' ? citating : []
 }
 export const getCitatedPatents = (html: any, header: string[]) => {

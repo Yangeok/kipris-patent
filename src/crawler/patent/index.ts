@@ -9,7 +9,7 @@ import { getBibliographic, getApplicants, getCpcs, getCitatedPatents, getCitatin
 import { csvWriteHeader, Indexable, delayPromise, getURL } from '../../utils'
 import { getProgressBar, getPlaywright } from '../../middlewares'
 import { IBibliographic, IApplicant, IInventor, IIpc, ICpc, IClaim, ICitating, ICitated, IFamilyPatent, IApplicantNumber, IApplicationNumber, IFile } from '../../interfaces'
-import { patentFiles, citatingFields, citatedFields, familyPatentFields, applicantFields } from '../../constants'
+import { patentFiles, citatingFields, citatedFields, familyPatentFields, applicantFields, bibliographicFields } from '../../constants'
 
 async function getList(page: Page, barl: SingleBar, params: {
   startDate: string, 
@@ -95,8 +95,12 @@ async function getListData(page: Page, params: {
         familyPatents: JSON.stringify(details?.familyPatents)
       } as IBibliographic
 
-      fs.appendFile(params.files[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
+      if (details?.applicants === undefined) {
+        return
+      }
       
+      console.log(result)
+      fs.appendFile(params.files[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
       return result
     }
 
@@ -176,13 +180,13 @@ async function getDataDetails(params: {
   console.log('#@# url: ', url)
 
   try {
-    const [{ data: html02 }] = await Promise.all([await axios.get(`${url}&next=biblioViewSub02&getType=Sub02`)])
+    const [{ data: html02 }] = await Promise.all([delayPromise(await axios.get(`${url}&next=biblioViewSub02&getType=Sub02`), 500)])
 
     // 인명정보
     const applicants = getApplicants(html02) // 출원인
     const inventors = getInventors(html02) // 발명인
 
-    if (applicants.filter(i => i.number.charAt(0) === '1')) {
+    if (applicants.filter(i => i.number.charAt(0) === '1').length > 0) {
       const [
         { data: html01 },
         // { data: html02 },
@@ -205,6 +209,7 @@ async function getDataDetails(params: {
 
       // 서지정보
       const bibliographic = getBibliographic(html01)
+      console.log(bibliographic)
       const ipcs = getIpcs(html01)
       const cpcs = getCpcs(html01)
       
