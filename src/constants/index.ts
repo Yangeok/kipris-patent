@@ -1,7 +1,7 @@
 import { IIpc, ICpc, IApplicant, IBibliographic, IInventor, IClaim, ICitating, ICitated, IFamilyPatent, ICorpFinance, ICorpMarket, ICorpOutline } from '../interfaces'
 
 // Patent
-export const bibliographicFields: Array<keyof IBibliographic> = ['inventionTitle', 'applicationNumber', 'applicationDate', 'registerStatus', 'registerNumber', 'registerDate', 'publishNumber', 'publishDate', 'intlApplNumber', 'intlApplDate', 'intlPublishNumber', 'intlPublishDate', 'astrtCont', 'claimCount']
+export const bibliographicFields: Array<keyof IBibliographic> = ['inventionTitle', 'applicationNumber', 'applicationDate', 'registerStatus', 'registerNumber', 'registerDate', 'publishNumber', 'publishDate', 'intlApplNumber', 'intlApplDate', 'intlPublishNumber', 'intlPublishDate', 'claimReqDate', 'claimCount', 'astrtCont']
 export const ipcFields: Array<keyof IIpc> = ['ipcCode', 'ipcDate']
 export const cpcFields: Array<keyof ICpc> = ['cpcCode', 'cpcDate']
 export const applicantFields: Array<keyof IApplicant> = ['applicantName', 'applicantNumber', 'applicantNationality', 'applicantAddress']
@@ -14,7 +14,7 @@ export const familyPatentFields: Array<keyof IFamilyPatent> = ['failyNumber', 'n
 // Patent files
 export const patentFiles = [{
   name: 'patent',
-  fields: [...bibliographicFields, 'applicants', 'inventors', 'ipcs', 'cpcs', 'claims', 'citatingPatents', 'citatedPatents', 'familyPatents']
+  fields: [...bibliographicFields, 'applicants', 'inventors', 'claims', 'ipcs', 'cpcs', 'citatingPatents', 'citatedPatents', 'familyPatents']
 }, {
   name: 'patent-bibliographic',
   fields: bibliographicFields

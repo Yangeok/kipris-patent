@@ -1,6 +1,5 @@
 import { parse } from 'node-html-parser'
 import fromEntries from 'fromentries'
-import { ICitating } from '../../interfaces'
 
 export const getBibliographic = (html: any) => {
   const newDocument = parse(html)

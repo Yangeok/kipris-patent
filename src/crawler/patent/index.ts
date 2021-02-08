@@ -90,6 +90,8 @@ async function getListData(page: Page, params: {
         applicants: JSON.stringify(details?.applicants),
         inventors: JSON.stringify(details?.inventors),
         claims: JSON.stringify(details?.claims),
+        ipcs: JSON.stringify(details?.ipcs),
+        cpcs: JSON.stringify(details?.cpcs),
         citatingPatents: JSON.stringify(details?.citatingPatents),
         citatedPatents: JSON.stringify(details?.citatedPatents),
         familyPatents: JSON.stringify(details?.familyPatents)
