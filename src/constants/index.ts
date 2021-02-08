@@ -9,35 +9,35 @@ export const inventorFields: Array<keyof IInventor> = ['applicationNumber', 'inv
 export const claimFields: Array<keyof IClaim> = ['applicationNumber', 'claimDescription']
 export const citatingFields: Array<keyof ICitating> = ['applicationNumber', 'nationality', 'publishNumber', 'publishDate', 'inventionTitle', 'ipcCode']
 export const citatedFields: Array<keyof ICitated> = ['applicationNumber', 'applicationDate', 'inventionTitle', 'ipcCode']
-export const familyPatentFields: Array<keyof IFamilyPatent> = ['applicationNumber', 'failyNumber', 'nationalityCode', 'nationality', 'failyType']
+export const familyPatentFields: Array<keyof IFamilyPatent> = ['applicationNumber', 'failyNumber', 'nationalityCode', 'nationality', 'familyType']
 
 // Patent files
 export const patentFiles = [{
-  name: 'patent',
+  name: 'patent-bibliographic',
   fields: bibliographicFields
 }, {
-  name: 'ipc',
+  name: 'patent-ipc',
   fields: ipcFields
 }, {
-  name: 'cpc',
+  name: 'patent-cpc',
   fields: cpcFields
 }, {
-  name: 'applicant',
+  name: 'patent-applicant',
   fields: applicantFields
 }, {
-  name: 'inventor',
+  name: 'patent-inventor',
   fields: inventorFields
 }, {
-  name: 'claim',
+  name: 'patent-claim',
   fields: claimFields
 }, {
-  name: 'citating',
+  name: 'patent-citating',
   fields: citatingFields
 }, {
-  name: 'citated',
+  name: 'patent-citated',
   fields: citatedFields
 }, {
-  name: 'family',
+  name: 'patent-family',
   fields: familyPatentFields
 }]
 
@@ -48,7 +48,7 @@ export const corpFinanceFields: Array<keyof ICorpFinance> = ['corpNumber', 'tota
 
 // Corporation files
 export const corpFiles = [{
-  name: 'corp',
+  name: 'corp-outline',
   fields: corpOutlineFields
 }, {
   name: 'corp-finance',

@@ -1,3 +1,5 @@
+import { WriteStream } from 'fs'
+
 // Patent
 export interface IApplicationNumber {
   applicationNumber: string
@@ -8,8 +10,15 @@ export interface IBibliographic extends IApplicationNumber {
   registerStatus: string
   registerNumber: string | number
   registerDate: string | Date
-  astrtCont: string
+  publishNumber: string | number
+  publishDate: string | Date
+  intlApplNumber: string | number
+  intlApplDate: string | Date
+  intlPublishNumber: string | number
+  intlPublishDate: string | Date
+  claimReqDate: string | Date
   claimCount: string | number
+  astrtCont: string
 }
 export interface IApplicantNumber {
   applicantNumber: string | number
@@ -54,7 +63,7 @@ export interface IFamilyPatent extends IApplicationNumber {
   failyNumber: string | number
   nationalityCode: string
   nationality: string
-  failyType: string
+  familyType: string
 }
 
 // Corporation
@@ -87,4 +96,11 @@ export interface ICorpFinance extends ICorpNumber {
   capital: string | number
   roe: string | number
   employees: string | number
+}
+
+// Common
+export interface IFile {
+  name: string
+  filePath: string
+  file: WriteStream
 }
