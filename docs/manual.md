@@ -51,7 +51,9 @@
   - nationalityCode: 국가코드
   - nationality: 패밀러특허국적
   - type: 패밀리타입
+
 ### Way 2 - 파일 분리 제공
+
 #### 서지정보
 
 - 파일명 컨벤션: `patent_bibliographic_<start_date>_<end_date>.csv`
@@ -118,8 +120,39 @@
 
 ## 기업 데이터 필드 설명
 
-### 파일 분리
-### 기업 개요
+### Way 1 - 원파일 제공
+
+- 어미가 `*s`인 변수는 복수 개의 데이터를 의미합니다.
+- 복수 개의 데이터를 담은 필드는 문자열 처리한 json 포맷입니다.
+- python에서 사용하시려면 json을 파싱하신 후에 사용해주세요.
+
+- 파일명 컨벤션: `patent_<start_date>_<end_date>.csv`
+- applicantNumber: 출원인번호
+- corpNumber: 법인번호
+- businessNumber: 사업자등록번호
+- repName: 대표자명
+- estDate: 설립일자
+- address: 주소
+- corpName: 법인명
+- corpScale: 법인규모
+- corpForm: 법인형태
+- indCat: 산업분류
+- nationality: 법인국적
+- isExtAudit: 외감여부
+- isClose: 폐업여부
+- isPublic: 상장여부
+- totalSales: 시가총액
+- bizProfits: 매출액
+- crtmNetIncome: 당기순이익
+- assets: 자산
+- liabilities: 부채
+- capital: 자본
+- roe: 자기자본이익률
+- employees: 종업원수
+
+### Way 2 - 파일 분리 제공
+
+#### 기업 개요
 - 파일명 컨벤션: `corp_outline_<start_date>_<end_date>.csv`
 - applicantNumber: 출원인번호 (참조키)
 - corpNumber: 법인번호 (기본키)
@@ -136,7 +169,7 @@
 - isClose: 폐업여부
 - isPublic: 상장여부
 
-### 기업 재무
+#### 기업 재무
 - 파일명 컨벤션: `corp_finance_<start_date>_<end_date>.csv`
 - corpNumber: 법인번호 (참조키)
 - totalSales: 시가총액
