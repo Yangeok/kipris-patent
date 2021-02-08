@@ -147,7 +147,6 @@
 - assets: 자산
 - liabilities: 부채
 - capital: 자본
-- roe: 자기자본이익률
 - employees: 종업원수
 
 ### Way 2 - 파일 분리 제공
@@ -178,7 +177,6 @@
 - assets: 자산
 - liabilities: 부채
 - capital: 자본
-- roe: 자기자본이익률
 - employees: 종업원수
 
 ## 추가 가능한 정보
