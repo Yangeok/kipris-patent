@@ -13,8 +13,10 @@ export const getBibliographic = (html: any) => {
   const bibliographic = {
     registerNumber: tableData[4].split('(')[0], // 등록번호
     registerDate: tableData[4].split('(')[1] !== undefined ? tableData[4].split('(')[1]?.replace(')', '').replace(/\./g, '-') : '', // 등록일자
-    publishNumber: [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1] !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[0].replace(/\n/g, '').replace(/\t/g, '').replace(/[^0-9]/g, '') : '', // 공개번호
-    publishDate: [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1] !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1].replace(/\./g, '-').replace(')', '').replace(/\n/g, '').replace(/\t/g, ''): '', // 공개일자
+    publishNumber: tableData[5].split('(')[0], // 공개번호
+    publishDate: tableData[5].split('(')[1] !== undefined ? tableData[5].split('(')[1]?.replace(')', '').replace(/\./g, '-') : '', // 공개일자
+    // publishNumber: [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1] !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[0].replace(/\n/g, '').replace(/\t/g, '').replace(/[^0-9]/g, '') : '', // 공개번호
+    // publishDate: [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1] !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1].replace(/\./g, '-').replace(')', '').replace(/\n/g, '').replace(/\t/g, ''): '', // 공개일자
     // 공고번호
     // 공고일자
     intlApplNumber: tableData[8].split('(')[0] !== undefined ? tableData[8].split('(')[0]: '', // 국제출원번호
@@ -127,8 +129,8 @@ export const getCitatingPatents = (html: any, header: string[]) => {
       ))
   const citating = citatingValues
   .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))) : '')
-
-  return citating
+  
+  return citating[0] !== '' ? citating : []
 }
 export const getCitatedPatents = (html: any, header: string[]) => {
   const newDocument = parse(html)
@@ -143,7 +145,7 @@ export const getCitatedPatents = (html: any, header: string[]) => {
   const citated = citatedValues
     .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))): '')
 
-  return citated
+  return citated[0] !== '' ? citated : []
 }
 export const getFamilyPatents = (html: any, header: string[]) => {
   const newDocument = parse(html)
