@@ -1,7 +1,7 @@
 import { IIpc, ICpc, IApplicant, IBibliographic, IInventor, IClaim, ICitating, ICitated, IFamilyPatent, ICorpFinance, ICorpMarket, ICorpOutline } from '../interfaces'
 
 // Patent
-export const bibliographicFields: Array<keyof IBibliographic> = ['inventionTitle', 'applicationNumber', 'applicationDate', 'registerStatus', 'registerNumber', 'registerDate', 'astrtCont', 'claimCount']
+export const bibliographicFields: Array<keyof IBibliographic> = ['inventionTitle', 'applicationNumber', 'applicationDate', 'registerStatus', 'registerNumber', 'registerDate', 'publishNumber', 'publishDate', 'intlApplNumber', 'intlApplDate', 'intlPublishNumber', 'intlPublishDate', 'astrtCont', 'claimCount']
 export const ipcFields: Array<keyof IIpc> = ['ipcCode', 'ipcDate']
 export const cpcFields: Array<keyof ICpc> = ['cpcCode', 'cpcDate']
 export const applicantFields: Array<keyof IApplicant> = ['applicantName', 'applicantNumber', 'applicantNationality', 'applicantAddress']
