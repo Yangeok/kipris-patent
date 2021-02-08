@@ -13,6 +13,9 @@ export const familyPatentFields: Array<keyof IFamilyPatent> = ['applicationNumbe
 
 // Patent files
 export const patentFiles = [{
+  name: 'patent',
+  fields: [...bibliographicFields, 'applicants', 'inventors', 'ipcs', 'cpcs', 'claims', 'citatingPatents', 'citatedPatents', 'familyPatents']
+}, {
   name: 'patent-bibliographic',
   fields: bibliographicFields
 }, {
