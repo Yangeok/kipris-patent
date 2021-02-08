@@ -4,18 +4,22 @@ import path from 'path'
 import csv from 'csvtojson'
 import fs from 'fs'
 
-import { csvWriteHeader } from '../../utils'
+import { getCorpName, getCorpDetailInfo, getCorpFinancialInfo, getIsPublic, getCorpMarketInfo } from './getDetail'
+
+import { csvWriteHeader, fromEntries, currenyFormatter } from '../../utils'
 import { getPlaywright, getProgressBar } from '../../middlewares'
 import { ICorpOutline, ICorpMarket, ICorpFinance, ICorpNumber } from '../../interfaces'
 import { corpFiles, corpOutlineFields, corpMarketFields, corpFinanceFields} from '../../constants'
 
 const username = process.env.DS_USERNAME as string
 const password = process.env.DS_PASSWORD as string
+console.log({ username, password })
 
 async function getUserSession (page: Page) {
   // 로그인 페이지 이동
   await page.goto('https://www.deepsearch.com/login')
-  
+  await page.evaluate(() => window.stop())
+
   // 로그인
   await page.$eval('input[placeholder="계정"]', (el: HTMLInputElement, id) => el.value = id, username)
   await page.$eval('input[placeholder="비밀번호"]', (el: HTMLInputElement, pw) => el.value = pw, password)
@@ -24,34 +28,6 @@ async function getUserSession (page: Page) {
   // 검색화면 이동
   await page.waitForSelector('.start-button')
   await page.click('.start-button')
-}
-
-async function getCorpDetailInfo (page: Page) {
-  const data = await page.evaluate(() => {
-    const header = Array.from(document.querySelectorAll('#info-list .company-details .info')).map(i => (i.querySelector('.key') as HTMLElement).innerText)
-    const values = Array.from(document.querySelectorAll('#info-list .company-details .info')).map((i, idx) => {
-      if (idx === 0) {
-        return Array.from(i.querySelectorAll('.value i')).map(j => (j as HTMLElement).innerText)
-      } 
-      if (idx === 1) {
-        return (i.querySelector('.value') as HTMLElement).innerText.replace('년 ', '-').replace('월 ', '-').replace('일', '')
-      }
-      return idx === 0 ? Array.from(i.querySelectorAll('.value i')).map(j => (j as HTMLElement).innerText) : (i.querySelector('.value') as HTMLElement).innerText
-    })
-    
-    const result: any = {}
-    header.forEach((i, idx) => result[i] = values[idx])
-    result['지번 주소'] = result['지번 주소'].replace(/\,/g, '')
-    
-    return result
-  })
-
-  console.log({ data })
-  return await data
-}
-
-async function getCorpFinancialInfo (page: Page) {
-    
 }
 
 async function getList(page: Page, barl: SingleBar, params: {
@@ -64,32 +40,45 @@ async function getList(page: Page, barl: SingleBar, params: {
   await page.click('.icon-search')
   
   // 검색결과 슬라이싱
-  await page.waitForTimeout(5000)
+  await page.waitForTimeout(2000)
 
+  // 첫번째 검색결과 클릭
+  await page.click('.company-content .name span')
+  await page.evaluate(() => {
+    const firstResult = document.querySelector('.company-content .name span') as HTMLElement
+    if (firstResult !== null) {
+      firstResult.click()
+    }
+    return
+  })
+  await page.waitForTimeout(2000)
+
+  const name = await getCorpName(page)
+  const isPublic = await getIsPublic(page)
   const details = await getCorpDetailInfo(page)
   const financials = await getCorpFinancialInfo(page)
+  const markets = await getCorpMarketInfo(page)
 
-  return { details, financials }
+  return { name, isPublic, details, financials, markets }
 }
 
 export async function getCorpInfo ({ startDate, endDate }: { startDate: string, endDate: string }) {
   // 출원인 가져오기 위한 파일 정제 작업
-  const filePath = `examppatent-${startDate}-${endDate}.csv`
+  const filePath = `patent-${startDate}-${endDate}.csv`
 
-  const fields = ['businessNumber', 'corpNumber', 'repName', 'estDate', 'address', 'corpName', 'applicantNumber', 'applicantNationality', ]
-  const file = fs.createWriteStream(path.join(__dirname, '../../outputs', `corp-${startDate}-${endDate}.csv`), 'utf-8')
+  const fields = ['applicantNumber', 'corpNumber', 'businessNumber', 'repName', 'estDate', 'address', 'corpName', 'corpScale', 'corpForm', 'indCat', 'nationality', 'isExtAudit', 'isClose', 'isPublic', 'totalSales', 'bizProfits', 'crtmNetIncome', 'assets', 'liabilities', 'capital', 'employees']
+  const file = fs.createWriteStream(path.join(__dirname, '../../../outputs', `corp-${startDate}-${endDate}.csv`), 'utf-8')
   file.write(csvWriteHeader(fields))
 
   const arr: any[][] = []
   await csv({ delimiter: ';' })
-    .fromFile(path.join(__dirname, '../../outputs', filePath))
+    .fromFile(path.join(__dirname, '../../../outputs', filePath))
     .then(json => arr.push(json))
 
   const corporations = arr[0]
     .map(i => JSON.parse(i.applicants))
     .reduce((acc, value) => acc.concat(value), [])
     .filter((i: any) => i.number.charAt(0) === '1' || i.number.charAt(0) === '5')
-  console.log(corporations, corporations.length)
 
   const barl = getProgressBar()
   const { page } = await getPlaywright()
@@ -105,12 +94,36 @@ export async function getCorpInfo ({ startDate, endDate }: { startDate: string, 
     if (Number(i.number.charAt(0)) !== 5) {
       const result = await getList(page, barl, params)
       console.log(result)
-      
-      // file.write(`${result.details['사업자 등록번호']};${result.details['법인 등록번호']};${result.details['대표이사']};${result.details['설립일자'] ? result.details['설립일자'] : ''};${result.details['지번 주소']};${i.name};${i.number};${i.nationality}\n`, err => err && console.log(`> saving file err`))
+
+      // `
+      // ${i.number};
+      // ${result.details['법인 등록번호'].replace(/\-/g, '')};
+      // ${result.details['사업자 등록번호'].replace(/\-/g, '')};
+      // ${result.details['대표이사']};
+      // ${result.details['설립일자'] ? result.details['설립일자'] : ''};
+      // ${result.details['지번 주소']};
+      // ${result.name};
+      // ${result.details['기업형태'].split(' | ')[1]};
+      // ${result.details['기업형태'].split(' | ')[0]};
+      // ${result.details['산업분류']};
+      // ${i.nationality};
+      // ${result.details['기업형태'].split(' | ')[2]};
+      // ${result.details['기업형태'].split(' | ')[3] ? result.details['기업형태'].split(' | ')[3] : ''};
+      // ${result.isPublic};
+      // ${result.markets['시가총액'] ? result.markets['시가총액'] : ''};
+      // ${result.financials['매출액'] ? currenyFormatter(result.financials['매출액'].replace(/\,/g, '')) : ''};
+      // ${result.financials['당기순이익'] ? currenyFormatter(result.financials['당기순이익'].replace(/\,/g, '')) : ''};
+      // ${result.financials['자산'] ? currenyFormatter(result.financials['자산'].replace(/\,/g, '')) : ''};
+      // ${result.financials['부채'] ? currenyFormatter(result.financials['부채'].replace(/\,/g, '')) : ''};
+      // ${result.financials['자본'] ? currenyFormatter(result.financials['자본'].replace(/\,/g, '')) : ''};
+      // ${result.financials['종업원수(명)'] ? result.financials['종업원수(명)'].replace(/\,/g, '') : ''};
+      // \n
+      // `
+
+      file.write(`${i.number};${result.details['법인 등록번호'].replace(/\-/g, '')};${result.details['사업자 등록번호'].replace(/\-/g, '')};${result.details['대표이사']};${result.details['설립일자'] ? result.details['설립일자'] : ''};${result.details['지번 주소']};${result.name};${result.details['기업형태'].split(' | ')[1]};${result.details['기업형태'].split(' | ')[0]};${result.details['산업분류']};${i.nationality};${result.details['기업형태'].split(' | ')[2]};${result.details['기업형태'].split(' | ')[3] ? result.details['기업형태'].split(' | ')[3] : ''};${result.isPublic};${result.financials['매출액'] ? currenyFormatter(result.financials['매출액'].replace(/\,/g, '')) : ''};${result.financials['당기순이익'] ? currenyFormatter(result.financials['당기순이익'].replace(/\,/g, '')) : ''};${result.financials['자산'] ? currenyFormatter(result.financials['자산'].replace(/\,/g, '')) : ''};${result.financials['부채'] ? currenyFormatter(result.financials['부채'].replace(/\,/g, '')) : ''};${result.financials['자본'] ? currenyFormatter(result.financials['자본'].replace(/\,/g, '')) : ''};${result.financials['종업원수(명)'] ? result.financials['종업원수(명)'].replace(/\,/g, '') : ''};\n`, err => err && console.log(`> saving file err`))
       return result
     }
 
-    file.write(`;;;;${i.address};${i.name};${i.number};${i.nationality}\n`, err => err && console.log(`> saving file err`))
     return
   }, Promise.resolve())
 }
