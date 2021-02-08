@@ -26,6 +26,7 @@
 - astrtCont: 요약
 - applicants: 출원인 (json 타입)
   - name: 출원인명
+  - number: 출원인번호
   - nationality: 출원인국적
   - address: 출원인주소
 - inventors: 발명인 (json 타입)
@@ -75,6 +76,7 @@
 - 파일명 컨벤션: `patent_applicant_<start_date>_<end_date>.csv`
 - applicationNumber: 출원번호 (참조키)
 - name: 출원인명
+- number: 출원인번호
 - nationality: 출원인국적
 - address: 출원인주소
 #### 발명인
