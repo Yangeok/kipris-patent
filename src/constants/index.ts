@@ -2,14 +2,14 @@ import { IIpc, ICpc, IApplicant, IBibliographic, IInventor, IClaim, ICitating, I
 
 // Patent
 export const bibliographicFields: Array<keyof IBibliographic> = ['inventionTitle', 'applicationNumber', 'applicationDate', 'registerStatus', 'registerNumber', 'registerDate', 'astrtCont', 'claimCount']
-export const ipcFields: Array<keyof IIpc> = ['applicationNumber', 'ipcCode', 'ipcDate']
-export const cpcFields: Array<keyof ICpc> = ['applicationNumber', 'cpcCode', 'cpcDate']
-export const applicantFields: Array<keyof IApplicant> = ['applicationNumber', 'applicantName', 'applicantNumber', 'applicantNationality', 'applicantAddress']
-export const inventorFields: Array<keyof IInventor> = ['applicationNumber', 'inventorName', 'inventorNumber', 'inventorNationality', 'inventorAddress']
-export const claimFields: Array<keyof IClaim> = ['applicationNumber', 'claimDescription']
-export const citatingFields: Array<keyof ICitating> = ['applicationNumber', 'nationality', 'publishNumber', 'publishDate', 'inventionTitle', 'ipcCode']
-export const citatedFields: Array<keyof ICitated> = ['applicationNumber', 'applicationDate', 'inventionTitle', 'ipcCode']
-export const familyPatentFields: Array<keyof IFamilyPatent> = ['applicationNumber', 'failyNumber', 'nationalityCode', 'nationality', 'familyType']
+export const ipcFields: Array<keyof IIpc> = ['ipcCode', 'ipcDate']
+export const cpcFields: Array<keyof ICpc> = ['cpcCode', 'cpcDate']
+export const applicantFields: Array<keyof IApplicant> = ['applicantName', 'applicantNumber', 'applicantNationality', 'applicantAddress']
+export const inventorFields: Array<keyof IInventor> = ['inventorName', 'inventorNumber', 'inventorNationality', 'inventorAddress']
+export const claimFields: Array<keyof IClaim> = ['claimDescription']
+export const citatingFields: Array<keyof ICitating> = ['nationality', 'publishNumber', 'publishDate', 'inventionTitle', 'ipcCode']
+export const citatedFields: Array<keyof ICitated> = ['applicationDate', 'inventionTitle', 'ipcCode']
+export const familyPatentFields: Array<keyof IFamilyPatent> = ['failyNumber', 'nationalityCode', 'nationality', 'familyType']
 
 // Patent files
 export const patentFiles = [{
