@@ -25,7 +25,7 @@ async function getList(page: Page, barl: SingleBar, params: {
   
   // 검색
   Promise.all([
-    await page.type('#queryText', `AD=[${params.startDate}~${params.endDate}]`),
+    await page.type('#queryText', `GD=[${params.startDate}~${params.endDate}]`),
     await page.click('.input_btn')
   ])
   
