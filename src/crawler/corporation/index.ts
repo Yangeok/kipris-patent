@@ -13,8 +13,6 @@ import { corpFiles, corpOutlineFields, corpMarketFields, corpFinanceFields} from
 
 const username = process.env.DS_USERNAME as string
 const password = process.env.DS_PASSWORD as string
-// const username = 'yangeok@samb.kr' // process.env.DS_USERNAME as string
-// const password = '17061706w!' // process.env.DS_PASSWORD as string
 console.log({ username, password })
 
 async function getUserSession (page: Page) {
