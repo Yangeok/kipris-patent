@@ -41,6 +41,10 @@ async function getList(page: Page, barl: SingleBar, params: {
   
   // 검색결과 슬라이싱
   await page.waitForTimeout(2000)
+  const notFound = await page.$('.not-found-message')
+  if (notFound) {
+    return
+  }
 
   // 첫번째 검색결과 클릭
   await page.click('.company-content .name span')
@@ -119,8 +123,9 @@ export async function getCorpInfo ({ startDate, endDate }: { startDate: string, 
       // ${result.financials['종업원수(명)'] ? result.financials['종업원수(명)'].replace(/\,/g, '') : ''};
       // \n
       // `
-
-      file.write(`${i.number};${result.details['법인 등록번호'].replace(/\-/g, '')};${result.details['사업자 등록번호'].replace(/\-/g, '')};${result.details['대표이사']};${result.details['설립일자'] ? result.details['설립일자'] : ''};${result.details['지번 주소']};${result.name};${result.details['기업형태'].split(' | ')[1]};${result.details['기업형태'].split(' | ')[0]};${result.details['산업분류']};${i.nationality};${result.details['기업형태'].split(' | ')[2]};${result.details['기업형태'].split(' | ')[3] ? result.details['기업형태'].split(' | ')[3] : ''};${result.isPublic};${result.financials['매출액'] ? currenyFormatter(result.financials['매출액'].replace(/\,/g, '')) : ''};${result.financials['당기순이익'] ? currenyFormatter(result.financials['당기순이익'].replace(/\,/g, '')) : ''};${result.financials['자산'] ? currenyFormatter(result.financials['자산'].replace(/\,/g, '')) : ''};${result.financials['부채'] ? currenyFormatter(result.financials['부채'].replace(/\,/g, '')) : ''};${result.financials['자본'] ? currenyFormatter(result.financials['자본'].replace(/\,/g, '')) : ''};${result.financials['종업원수(명)'] ? result.financials['종업원수(명)'].replace(/\,/g, '') : ''};\n`, err => err && console.log(`> saving file err`))
+      if (result) {
+        file.write(`${i.number};${result.details['법인 등록번호'].replace(/\-/g, '')};${result.details['사업자 등록번호'].replace(/\-/g, '')};${result.details['대표이사']};${result.details['설립일자'] ? result.details['설립일자'] : ''};${result.details['지번 주소']};${result.name};${result.details['기업형태'].split(' | ')[1]};${result.details['기업형태'].split(' | ')[0]};${result.details['산업분류']};${i.nationality};${result.details['기업형태'].split(' | ')[2]};${result.details['기업형태'].split(' | ')[3] ? result.details['기업형태'].split(' | ')[3] : ''};${result.isPublic};${result.financials['매출액'] ? currenyFormatter(result.financials['매출액'].replace(/\,/g, '')) : ''};${result.financials['당기순이익'] ? currenyFormatter(result.financials['당기순이익'].replace(/\,/g, '')) : ''};${result.financials['자산'] ? currenyFormatter(result.financials['자산'].replace(/\,/g, '')) : ''};${result.financials['부채'] ? currenyFormatter(result.financials['부채'].replace(/\,/g, '')) : ''};${result.financials['자본'] ? currenyFormatter(result.financials['자본'].replace(/\,/g, '')) : ''};${result.financials['종업원수(명)'] ? result.financials['종업원수(명)'].replace(/\,/g, '') : ''};\n`, err => err && console.log(`> saving file err`))
+      }
       return result
     }
 
