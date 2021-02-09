@@ -13,6 +13,8 @@ import { corpFiles, corpOutlineFields, corpMarketFields, corpFinanceFields} from
 
 const username = process.env.DS_USERNAME as string
 const password = process.env.DS_PASSWORD as string
+// const username = 'yangeok@samb.kr' // process.env.DS_USERNAME as string
+// const password = '17061706w!' // process.env.DS_PASSWORD as string
 console.log({ username, password })
 
 async function getUserSession (page: Page) {
@@ -37,7 +39,11 @@ async function getList(page: Page, barl: SingleBar, params: {
   // 검색
   await page.waitForSelector('.search-bar')
   await page.$eval('#main-app-bar-search', (el: HTMLInputElement, cpName: string) => el.value = cpName, params.corpName.replace('주식회사', '').replace('(주)', ''))
-  await page.click('.icon-search')
+  const searchButton = await page.$('.icon-search')
+  if (searchButton) {
+    await searchButton?.click()
+  }
+  // await page.click('.icon-search')
   
   // 검색결과 슬라이싱
   await page.waitForTimeout(2000)
@@ -47,14 +53,18 @@ async function getList(page: Page, barl: SingleBar, params: {
   }
 
   // 첫번째 검색결과 클릭
-  await page.click('.company-content .name span')
-  await page.evaluate(() => {
+  // await page.click('.company-content .name span')
+  const notFound2 = await page.evaluate(() => {
     const firstResult = document.querySelector('.company-content .name span') as HTMLElement
     if (firstResult !== null) {
       firstResult.click()
+      return false
     }
-    return
+    return true
   })
+  if (notFound2) {
+    return
+  }
   await page.waitForTimeout(2000)
 
   const name = await getCorpName(page)
