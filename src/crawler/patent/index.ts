@@ -8,8 +8,8 @@ import { getBibliographic, getApplicants, getCpcs, getCitatedPatents, getCitatin
 
 import { csvWriteHeader, Indexable, delayPromise, getURL } from '../../utils'
 import { getProgressBar, getPlaywright } from '../../middlewares'
-import { IBibliographic, IApplicant, IInventor, IIpc, ICpc, IClaim, ICitating, ICitated, IFamilyPatent, IApplicantNumber, IApplicationNumber, IFile } from '../../interfaces'
-import { patentFiles, citatingFields, citatedFields, familyPatentFields, applicantFields, bibliographicFields } from '../../constants'
+import { IBibliographic, ICitating, ICitated, IFamilyPatent, IFile } from '../../interfaces'
+import { patentFiles, citatingFields, citatedFields, familyPatentFields, } from '../../constants'
 
 async function getList(page: Page, barl: SingleBar, params: {
   startDate: string, 
@@ -39,6 +39,8 @@ async function getList(page: Page, barl: SingleBar, params: {
   await page.click('#pageSel a')
 
   await page.waitForSelector('#loadingBarBack', { state: 'hidden' })
+
+  // 페이지 카운트
   const contentsCount = await page.evaluate(() => {
     return {
       totalCount: Number((document.querySelector('.total') as HTMLElement).innerText.replace(/\,/g, '')),
@@ -69,7 +71,7 @@ async function getListData(page: Page, params: {
     citatedFields: Array<keyof ICitated>,
     familyPatentFields: Array<keyof IFamilyPatent>
   },
-}, isOneFile = true) {
+}) {
   await page.waitForSelector('.search_section')
   
   // 요약 리스트 수집
@@ -83,62 +85,52 @@ async function getListData(page: Page, params: {
       familyPatentFields: params.fields.familyPatentFields
     })
 
-    if (isOneFile) {
-      const result = {
-        ...i,
-        ...details?.bibliographic,
-        applicants: JSON.stringify(details?.applicants),
-        inventors: JSON.stringify(details?.inventors),
-        claims: JSON.stringify(details?.claims),
-        ipcs: JSON.stringify(details?.ipcs),
-        cpcs: JSON.stringify(details?.cpcs),
-        citatingPatents: JSON.stringify(details?.citatingPatents),
-        citatedPatents: JSON.stringify(details?.citatedPatents),
-        familyPatents: JSON.stringify(details?.familyPatents)
-      } as IBibliographic
-
-      if (details?.applicants === undefined) {
-        return
-      }
-      
-      console.log(result)
-      fs.appendFile(params.files[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
-      return result
-    }
-
     const result = {
       ...i,
       ...details?.bibliographic,
+      applicants: JSON.stringify(details?.applicants),
+      inventors: JSON.stringify(details?.inventors),
+      claims: JSON.stringify(details?.claims),
+      ipcs: JSON.stringify(details?.ipcs),
+      cpcs: JSON.stringify(details?.cpcs),
+      citatingPatents: JSON.stringify(details?.citatingPatents),
+      citatedPatents: JSON.stringify(details?.citatedPatents),
+      familyPatents: JSON.stringify(details?.familyPatents)
     } as IBibliographic
-    
-    // 출원인
-    const applicants = details?.applicants.map(i => Object.values(i).join(';')).join('\n') as string
-    fs.appendFile(params.files.filter(i => i.name === 'patent-applicant')[0].filePath, applicants + '\n', err => err && console.log(`> saving file err`))
-    
-    // 서지정보
-    fs.appendFile(params.files.filter(i => i.name === 'patent-bibliographic')[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
-    
-    // 발명인
-    const inventors = details?.inventors.map(i => Object.values(i).join(';')).join('\n') as string
-    fs.appendFile(params.files.filter(i => i.name === 'patent-inventor')[0].filePath, inventors + '\n', err => err && console.log(`> saving file err`))
-    
-    // 청구항
-    const claims = details?.claims.join('\n') as string
-    fs.appendFile(params.files.filter(i => i.name === 'patent-claim')[0].filePath, claims + '\n', err => err && console.log(`> saving file err`))
-    
-    // 인용 특허
-    const citating = details?.citatingPatents[0] !== '' ? details?.citatingPatents.map(i => Object.values((<any>i)).join(';')).join('\n') + '\n' as string : undefined
-    fs.appendFile(params.files.filter(i => i.name === 'patent-citating')[0].filePath, citating !== undefined ? citating : '', err => err && console.log(`> saving file err`))
-    
-    // 피인용 특허
-    const citated = details?.citatedPatents[0] !== '' ? details?.citatedPatents.map(i => Object.values((<any>i)).join(';')).join('\n') as string : undefined
-    fs.appendFile(params.files.filter(i => i.name === 'patent-citated')[0].filePath, citated !== undefined ? citated + '\n' : '', err => err && console.log(`> saving file err`))
-    
-    // 패밀리 특허
-    const family = details?.familyPatents !== [] ? details?.familyPatents.map(i => Object.values((<any>i)).join(';')).join('\n') as string : ''
-    fs.appendFile(params.files.filter(i => i.name === 'patent-family')[0].filePath, family !== '' ? family + '\n': '', err => err && console.log(`> saving file err`))
-    
+
+    if (details?.applicants === undefined) {
+      return
+    }
+
+    fs.appendFile(params.files[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
     return result
+
+    // // 출원인
+    // const applicants = details?.applicants.map(i => Object.values(i).join(';')).join('\n') as string
+    // fs.appendFile(params.files.filter(i => i.name === 'patent-applicant')[0].filePath, applicants + '\n', err => err && console.log(`> saving file err`))
+    
+    // // 서지정보
+    // fs.appendFile(params.files.filter(i => i.name === 'patent-bibliographic')[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
+    
+    // // 발명인
+    // const inventors = details?.inventors.map(i => Object.values(i).join(';')).join('\n') as string
+    // fs.appendFile(params.files.filter(i => i.name === 'patent-inventor')[0].filePath, inventors + '\n', err => err && console.log(`> saving file err`))
+    
+    // // 청구항
+    // const claims = details?.claims.join('\n') as string
+    // fs.appendFile(params.files.filter(i => i.name === 'patent-claim')[0].filePath, claims + '\n', err => err && console.log(`> saving file err`))
+    
+    // // 인용 특허
+    // const citating = details?.citatingPatents[0] !== '' ? details?.citatingPatents.map(i => Object.values((<any>i)).join(';')).join('\n') + '\n' as string : undefined
+    // fs.appendFile(params.files.filter(i => i.name === 'patent-citating')[0].filePath, citating !== undefined ? citating : '', err => err && console.log(`> saving file err`))
+    
+    // // 피인용 특허
+    // const citated = details?.citatedPatents[0] !== '' ? details?.citatedPatents.map(i => Object.values((<any>i)).join(';')).join('\n') as string : undefined
+    // fs.appendFile(params.files.filter(i => i.name === 'patent-citated')[0].filePath, citated !== undefined ? citated + '\n' : '', err => err && console.log(`> saving file err`))
+    
+    // // 패밀리 특허
+    // const family = details?.familyPatents !== [] ? details?.familyPatents.map(i => Object.values((<any>i)).join(';')).join('\n') as string : ''
+    // fs.appendFile(params.files.filter(i => i.name === 'patent-family')[0].filePath, family !== '' ? family + '\n': '', err => err && console.log(`> saving file err`))
   }, <any>Promise.resolve())
 }
 
@@ -171,11 +163,11 @@ async function getDataDetails(params: {
   const urlParams = [
     ['method', 'biblioMain_biblio'],
     ['applno', params.applicationNumber],
-    // ['applno', '2020180005507'], // TMP: 패밀리특허
-    // ['applno', '2020190004255'], // TMP: 인용특허
-    // ['applno', '2020190000436'], // TMP: 피인용특허
-    // ['applno', '2020190002428'], // TMP: 공개번호
-    // ['applno', '2020197000068'], // TMP: 국제출원/공개
+    // ['applno', '2020180005507'], // 패밀리특허
+    // ['applno', '2020190004255'], // 인용특허
+    // ['applno', '2020190000436'], // 피인용특허
+    // ['applno', '2020190002428'], // 공개번호
+    // ['applno', '2020197000068'], // 국제출원/공개
     ['link', 'N']
   ]
   const url = getURL(baseUrl, urlParams)
@@ -211,7 +203,6 @@ async function getDataDetails(params: {
 
       // 서지정보
       const bibliographic = getBibliographic(html01)
-      console.log(bibliographic)
       const ipcs = getIpcs(html01)
       const cpcs = getCpcs(html01)
       
