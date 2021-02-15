@@ -1,5 +1,5 @@
-export const delayPromise = <T>(value: T, milliseconds: number): Promise<T> => {
-  return new Promise(resolve => setTimeout(resolve, milliseconds, value))
+export const delayPromise = <T>(value: T, milliseconds: number) => {
+  return new Promise<T>(resolve => setTimeout(resolve, milliseconds, value))
 }
 
 export const sleep = (milliseconds: number) => {
