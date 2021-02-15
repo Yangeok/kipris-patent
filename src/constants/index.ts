@@ -9,7 +9,7 @@ export const bibliographicFields: Array<keyof IBibliographic> = ['inventionTitle
 // export const claimFields: Array<keyof IClaim> = ['claimDescription']
 export const citatingFields: Array<keyof ICitating> = ['nationality', 'publishNumber', 'publishDate', 'inventionTitle', 'ipcCode']
 export const citatedFields: Array<keyof ICitated> = ['applicationDate', 'inventionTitle', 'ipcCode']
-export const familyPatentFields: Array<keyof IFamilyPatent> = ['failyNumber', 'nationalityCode', 'nationality', 'familyType']
+export const familyPatentFields: Array<keyof IFamilyPatent> = ['number', 'nationalityCode', 'nationality', 'type']
 
 // Patent files
 export const patentFiles = [{

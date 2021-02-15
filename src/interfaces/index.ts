@@ -67,10 +67,10 @@ export interface ICitated extends IApplicationNumber {
   ipcCode: string | IIpcCode
 }
 export interface IFamilyPatent extends IApplicationNumber {
-  failyNumber: string | number
+  number: string | number
   nationalityCode: string
   nationality: string
-  familyType: string
+  type: string
 }
 
 // Corporation
