@@ -3,13 +3,16 @@ import { Page } from 'playwright'
 import path from 'path'
 import csv from 'csvtojson'
 import fs from 'fs'
+import dotenv from 'dotenv'
 
-import { getCorpName, getCorpDetailInfo, getCorpFinancialInfo, getIsPublic, getCorpMarketInfo } from './getDetail'
+import { getCorpName, getCorpDetailInfo, getCorpFinancialInfo, getIsPublic, getCorpMarketInfo, getCorpsFromPatents } from './getDetail'
+import { saveCorpDetail } from './saveDetail'
 
-import { csvWriteHeader, fromEntries, currenyFormatter } from '../../utils'
+import { csvWriteHeader, currenyFormatter } from '../../utils'
 import { getPlaywright, getProgressBar } from '../../middlewares'
-import { ICorpOutline, ICorpMarket, ICorpFinance, ICorpNumber } from '../../interfaces'
-import { corpFiles, corpOutlineFields, corpMarketFields, corpFinanceFields} from '../../constants'
+import { corpOutlineFields } from '../../constants'
+
+dotenv.config()
 
 const username = process.env.DS_USERNAME as string
 const password = process.env.DS_PASSWORD as string
@@ -30,7 +33,7 @@ async function getUserSession (page: Page) {
   await page.click('.start-button')
 }
 
-async function getList(page: Page, barl: SingleBar, params: {
+async function getList(page: Page, params: {
   corpName: string, 
   filePath: string
 }) {
@@ -69,16 +72,16 @@ async function getList(page: Page, barl: SingleBar, params: {
   const isPublic = await getIsPublic(page)
   const details = await getCorpDetailInfo(page)
   const financials = await getCorpFinancialInfo(page)
-  const markets = await getCorpMarketInfo(page)
+  // const markets = await getCorpMarketInfo(page)
 
-  return { name, isPublic, details, financials, markets }
+  return { name, isPublic, details, financials }
 }
 
 export async function getCorpInfo ({ startDate, endDate }: { startDate: string, endDate: string }) {
   // 출원인 가져오기 위한 파일 정제 작업
   const filePath = `patent-${startDate}-${endDate}.csv`
 
-  const fields = ['applicantNumber', 'corpNumber', 'businessNumber', 'repName', 'estDate', 'address', 'corpName', 'corpScale', 'corpForm', 'indCat', 'nationality', 'isExtAudit', 'isClose', 'isPublic', 'totalSales', 'bizProfits', 'crtmNetIncome', 'assets', 'liabilities', 'capital', 'employees']
+  const fields = corpOutlineFields
   const file = fs.createWriteStream(path.join(__dirname, '../../../outputs', `corp-${startDate}-${endDate}.csv`), 'utf-8')
   file.write(csvWriteHeader(fields))
 
@@ -87,52 +90,25 @@ export async function getCorpInfo ({ startDate, endDate }: { startDate: string, 
     .fromFile(path.join(__dirname, '../../../outputs', filePath))
     .then(json => arr.push(json))
 
-  const corporations = arr[0]
-    .map(i => JSON.parse(i.applicants))
-    .reduce((acc, value) => acc.concat(value), [])
-    .filter((i: any) => i.number.charAt(0) === '1' || i.number.charAt(0) === '5')
+  const corporations = getCorpsFromPatents(arr)
 
   const barl = getProgressBar()
   const { page } = await getPlaywright()
   await getUserSession(page)
 
-  await corporations.reduce(async (prevPromise: any, i: any) => {
+  await corporations.reduce(async (prevPromise: any, i: any, idx: number) => {
     const params = {
       filePath,
       corpName: i.name
     }
-
+    
     await prevPromise
+    barl.start(corporations.length, idx)
     if (Number(i.number.charAt(0)) !== 5) {
-      const result = await getList(page, barl, params)
-      console.log(result)
+      const result = await getList(page, params)
 
-      // `
-      // ${i.number};
-      // ${result.details['법인 등록번호'].replace(/\-/g, '')};
-      // ${result.details['사업자 등록번호'].replace(/\-/g, '')};
-      // ${result.details['대표이사']};
-      // ${result.details['설립일자'] ? result.details['설립일자'] : ''};
-      // ${result.details['지번 주소']};
-      // ${result.name};
-      // ${result.details['기업형태'].split(' | ')[1]};
-      // ${result.details['기업형태'].split(' | ')[0]};
-      // ${result.details['산업분류']};
-      // ${i.nationality};
-      // ${result.details['기업형태'].split(' | ')[2]};
-      // ${result.details['기업형태'].split(' | ')[3] ? result.details['기업형태'].split(' | ')[3] : ''};
-      // ${result.isPublic};
-      // ${result.markets['시가총액'] ? result.markets['시가총액'] : ''};
-      // ${result.financials['매출액'] ? currenyFormatter(result.financials['매출액'].replace(/\,/g, '')) : ''};
-      // ${result.financials['당기순이익'] ? currenyFormatter(result.financials['당기순이익'].replace(/\,/g, '')) : ''};
-      // ${result.financials['자산'] ? currenyFormatter(result.financials['자산'].replace(/\,/g, '')) : ''};
-      // ${result.financials['부채'] ? currenyFormatter(result.financials['부채'].replace(/\,/g, '')) : ''};
-      // ${result.financials['자본'] ? currenyFormatter(result.financials['자본'].replace(/\,/g, '')) : ''};
-      // ${result.financials['종업원수(명)'] ? result.financials['종업원수(명)'].replace(/\,/g, '') : ''};
-      // \n
-      // `
       if (result) {
-        file.write(`${i.number};${result.details['법인 등록번호'].replace(/\-/g, '')};${result.details['사업자 등록번호'].replace(/\-/g, '')};${result.details['대표이사']};${result.details['설립일자'] ? result.details['설립일자'] : ''};${result.details['지번 주소']};${result.name};${result.details['기업형태'].split(' | ')[1]};${result.details['기업형태'].split(' | ')[0]};${result.details['산업분류']};${i.nationality};${result.details['기업형태'].split(' | ')[2]};${result.details['기업형태'].split(' | ')[3] ? result.details['기업형태'].split(' | ')[3] : ''};${result.isPublic};${result.financials['매출액'] ? currenyFormatter(result.financials['매출액'].replace(/\,/g, '')) : ''};${result.financials['당기순이익'] ? currenyFormatter(result.financials['당기순이익'].replace(/\,/g, '')) : ''};${result.financials['자산'] ? currenyFormatter(result.financials['자산'].replace(/\,/g, '')) : ''};${result.financials['부채'] ? currenyFormatter(result.financials['부채'].replace(/\,/g, '')) : ''};${result.financials['자본'] ? currenyFormatter(result.financials['자본'].replace(/\,/g, '')) : ''};${result.financials['종업원수(명)'] ? result.financials['종업원수(명)'].replace(/\,/g, '') : ''};\n`, err => err && console.log(`> saving file err`))
+        file.write(saveCorpDetail(i, result), err => err && console.log(`> saving file err`))
       }
       return result
     }
