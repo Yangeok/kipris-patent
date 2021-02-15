@@ -64,14 +64,20 @@ yarn && yarn start:ch
   - number: 발명인번호
   - nationality: 발명인국적
   - address: 발명인주소
-- claims: 청구항 (json 타입)
-  - claimDescription: 청구항설명
+- claims: 청구항 (json array타입)
+  - 청구항설명
 - citatingPatents: 인용특허 (json 타입)
   - nationality: 국적
   - publishNumber: 공보번호
   - publishDate: 공보일자
   - inventionTitle: 발명명
   - ipcCode: IPC코드
+- cpcs: CPC (json 타입)
+  - code: CPC 코드
+  - date: CPC 일자
+- ipcs: IPC (json 타입)
+  - code: IPC 코드
+  - date: IPC 일자
 - citatedPatents: 피인용특허 (json 타입)
   - applicationDate: 출원일자
   - inventionTitle: 발명명
