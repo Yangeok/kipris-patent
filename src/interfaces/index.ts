@@ -77,7 +77,7 @@ export interface IFamilyPatent extends IApplicationNumber {
 export interface ICorpNumber {
   corpNumber: string | number
 }
-export interface ICorpOutline extends IApplicantNumber, ICorpNumber {
+export interface ICorpOutline extends IApplicantNumber, ICorpNumber, ICorpFinance {
   businessNumber: string | number
   repName: string
   estDate: string | Date
@@ -94,14 +94,13 @@ export interface ICorpOutline extends IApplicantNumber, ICorpNumber {
 export interface ICorpMarket extends ICorpNumber {
   marketCap: string | number
 }
-export interface ICorpFinance extends ICorpNumber {
+export interface ICorpFinance {
   totalSales: string | number
   bizProfits: string | number
   crtmNetIncome: string | number
   assets: string | number
   liabilities: string | number
   capital: string | number
-  roe: string | number
   employees: string | number
 }
 
