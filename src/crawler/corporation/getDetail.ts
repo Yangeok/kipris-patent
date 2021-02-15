@@ -1,5 +1,15 @@
 import { Page } from 'playwright'
+
 import { fromEntries } from '../../utils'
+
+export function getCorpsFromPatents (arr: any[][]) {
+  const result = arr[0]
+    .map(i => JSON.parse(i.applicants))
+    .reduce((acc, value) => acc.concat(value), [])
+    .filter((i: any) => i.number.charAt(0) === '1' || i.number.charAt(0) === '5')
+
+  return result
+}
 
 export async function getCorpDetailInfo (page: Page) {
   await page.waitForLoadState('domcontentloaded')
