@@ -1,6 +1,6 @@
 export { Indexable } from './types'
 export { sleep, delayPromise } from './async'
-export { csvWriteHeader, jsonWriteStream } from './filestream'
+export { csvWriteHeader } from './filestream'
 export { getURL } from './string'
 export { fromEntries } from './array'
 export { currenyFormatter } from './number'
