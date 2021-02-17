@@ -14,7 +14,7 @@ export const getBibliographic = (html: any) => {
     registerNumber: tableData[4].split('(')[0], // 등록번호
     registerDate: tableData[4].split('(')[1] !== undefined ? tableData[4].split('(')[1]?.replace(')', '').replace(/\./g, '-') : '', // 등록일자
     publishNumber: [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1] !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[0].replace(/\n/g, '').replace(/\t/g, '').replace(/[^0-9]/g, '') : '', // 공개번호
-    publishDate: [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1] !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1].replace(/\./g, '-').replace(')', '').replace(/\n/g, '').replace(/\t/g, '').replace(/  /g, '') : '', // 공개일자
+    publishDate: [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1] !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText.split('(65) 공개번호/일자 ')[1].split(' (')[1].replace(/\./g, '-').replace(')', '').replace(/\n/g, '').replace(/\t/g, '').replace(/  /g, '') : '', // 공개일자 // TODO: 
     // 공고번호
     // 공고일자
     intlApplNumber: tableData[7].split('(')[0] !== undefined ? tableData[8].split('(')[0]: '', // 국제출원번호
@@ -74,7 +74,7 @@ export const getApplicants = (html: any) => {
     return {
       applicationNumber: '',
       name: name[0].substr(0, name[0].length - 1),
-      number: name[2].replace(/[^0-9]/g, ''),
+      number: name[2] ? name[2].replace(/[^0-9]/g, '') : '',
       nationality: i.querySelector('.nationality').innerText,
       address: i.querySelector('.txt_left').innerText.replace('...', '')
     }
