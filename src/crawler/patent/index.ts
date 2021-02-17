@@ -171,7 +171,6 @@ async function getDataDetails(params: {
     ['link', 'N']
   ]
   const url = getURL(baseUrl, urlParams)
-  console.log('#@# url: ', url)
 
   try {
     const [{ data: html02 }] = await Promise.all([delayPromise(await axios.get(`${url}&next=biblioViewSub02&getType=Sub02`), 500)])
