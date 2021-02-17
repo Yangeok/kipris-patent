@@ -1,15 +1,16 @@
 import { SingleBar } from 'cli-progress'
 import { Page } from 'playwright'
-import axios from 'axios'
 import path from 'path'
 import fs from 'fs'
 
 import { getBibliographic, getApplicants, getCpcs, getCitatedPatents, getCitatingPatents, getClaims, getFamilyPatents, getInventors, getIpcs } from './getDetail'
 
-import { csvWriteHeader, Indexable, delayPromise, getURL } from '../../utils'
+import { csvWriteHeader, Indexable, delayPromise, getURL, axios } from '../../utils'
 import { getProgressBar, getPlaywright } from '../../middlewares'
 import { IBibliographic, ICitating, ICitated, IFamilyPatent, IFile } from '../../interfaces'
 import { patentFiles, citatingFields, citatedFields, familyPatentFields, } from '../../constants'
+
+
 
 async function getList(page: Page, barl: SingleBar, params: {
   startDate: string, 
@@ -33,7 +34,7 @@ async function getList(page: Page, barl: SingleBar, params: {
   await page.evaluate(() => {
     const { document } = (<Indexable>window)
     document.querySelector('#opt28 option[value="30"]').selected = true
-    document.querySelector('#opt28 option[value="30"]').value = 10
+    // document.querySelector('#opt28 option[value="30"]').value = 10
   })
   await page.click('#pageSel img')
   await page.click('#pageSel a')
