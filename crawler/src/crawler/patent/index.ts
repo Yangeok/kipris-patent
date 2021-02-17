@@ -77,7 +77,7 @@ async function getListData(page: Page, params: {
   
   // 요약 리스트 수집
   const summaries = await getDataSummaries(page)
-  await summaries.reduce(async (prevPromise, i) => {
+  await summaries.reduce(async (prevPromise, i, idx) => {
     await prevPromise
     const details = await getDataDetails({
       applicationNumber: i.applicationNumber,
@@ -250,9 +250,9 @@ async function getDataDetails(params: {
   }
 }
 
-export async function getPatentInfo ({ startDate, endDate }: { startDate: string, endDate: string }) {
+export async function getPatentInfo ({ startDate, endDate, outputPath }: { startDate: string, endDate: string, outputPath: string }) {
   const files = patentFiles.map(i => {
-    const filePath = path.join(__dirname, '../../../outputs', `${i.name}-${startDate}-${endDate}.csv`)
+    const filePath = path.join(__dirname, outputPath, `${i.name}-${startDate}-${endDate}.csv`)
     const file = fs.createWriteStream(filePath, 'utf-8')
     file.write(csvWriteHeader(i.fields))
 

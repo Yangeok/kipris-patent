@@ -77,17 +77,17 @@ async function getList(page: Page, params: {
   return { name, isPublic, details, financials }
 }
 
-export async function getCorpInfo ({ startDate, endDate }: { startDate: string, endDate: string }) {
+export async function getCorpInfo ({ startDate, endDate, outputPath }: { startDate: string, endDate: string, outputPath: string }) {
   // 출원인 가져오기 위한 파일 정제 작업
   const filePath = `patent-${startDate}-${endDate}.csv`
 
   const fields = corpOutlineFields
-  const file = fs.createWriteStream(path.join(__dirname, '../../../outputs', `corp-${startDate}-${endDate}.csv`), 'utf-8')
+  const file = fs.createWriteStream(path.join(__dirname, outputPath, `corp-${startDate}-${endDate}.csv`), 'utf-8')
   file.write(csvWriteHeader(fields))
 
   const arr: any[][] = []
   await csv({ delimiter: ';' })
-    .fromFile(path.join(__dirname, '../../../outputs', filePath))
+    .fromFile(path.join(__dirname, outputPath, filePath))
     .then(json => arr.push(json))
 
   const corporations = getCorpsFromPatents(arr)

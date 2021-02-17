@@ -1,0 +1,10 @@
+node_modules/
+yarn*
+
+.env*
+!.env.example
+outputs/
+
+!outputs/.example.20100101-20210131.csv
+
+.vscode
