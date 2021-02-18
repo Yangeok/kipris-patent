@@ -14,7 +14,7 @@ export const familyPatentFields: Array<keyof IFamilyPatent> = ['number', 'nation
 // Patent files
 export const patentFiles = [{
   name: 'patent',
-  fields: [...bibliographicFields, 'applicants', 'inventors', 'claims', 'ipcs', 'cpcs', 'citatingPatents', 'citatedPatents', 'familyPatents']
+  fields: [...bibliographicFields, 'applicants', 'applicantNumber', 'inventors', 'claims', 'ipcs', 'cpcs', 'citatingPatents', 'citatedPatents', 'familyPatents']
 }]
 
 // Corporation
