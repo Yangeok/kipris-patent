@@ -59,7 +59,7 @@ async function getList(page: Page, barl: SingleBar, params: {
     console.log({ startPage: params.startPage, currentPage })
     fs.writeFile('../current_page.log', String(currentPage), err => err && console.log(err))
 
-    if (params.startPage > currentPage) {
+    if (params.startPage >= currentPage) {
       Promise.all([
         await page.$eval('.board_pager03 strong', el => (el.nextElementSibling as HTMLElement).click()),
         await page.waitForSelector('#loadingBarBack', { state: 'hidden' })
