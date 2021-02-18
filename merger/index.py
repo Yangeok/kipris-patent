@@ -2,44 +2,32 @@ from pprintpp import pprint as pp
 import glob
 import os
 import pandas as pd
+import numpy as np
+from pandas import json_normalize
 
 start_date = '20200101'
 end_date = '20201231'
-
-input_patent_file = f'./corp-{start_date}-{end_date}.csv'
+input_patent_file = f'./patent-{start_date}-{end_date}.csv'
 input_corp_file = f'./corp-{start_date}-{end_date}.csv'
-output_file = f'./{start_date}-{end_date}.xlsx'
-
-dtype_conv_dict = {
-    'applicantNumber': 'string',
-    'corpNumber': 'string',
-    'businessNumber': 'string',
-    'bizProfits': 'string',
-    'crtmNetIncome': 'string',
-    'assets': 'string',
-    'liabilities': 'string',
-    'capital': 'string',
-    'employees': 'string'
-}
-
+output_xl_file = f'./{start_date}-{end_date}.xlsx'
+output_csv_file = f'./{start_date}-{end_date}.csv'
 df1 = pd.read_csv(input_patent_file, delimiter=';')
 df2 = pd.read_csv(input_corp_file, delimiter=';')
 
+# 파일 병합
 df = pd.merge(df1, df2, how='inner', on='applicantNumber')
 
-pp(df)
+# 중복열 제거
+res = df.drop_duplicates(keep='first')
 
-df.to_excel(output_file, index=False, header=True)
-'''
-- 특허파일에 기업파일을 머지할 예정
-- 특허파일을 열어서 출원인번호로 필터한 열 찾기
-- 공통키를 가진 열끼리 머지
-- 머지가 끝난 파일을 xlsx로 변경
-'''
+# 타입 통일
+res[[col for col in res.columns if res[col].dtypes == object]] = res[[
+    col for col in res.columns if df[col].dtypes == object]].astype('string')
+res[[col for col in res.columns if res[col].dtypes == 'int64']] = res[[
+    col for col in res.columns if df[col].dtypes == 'int64']].astype('string')
+res[[col for col in res.columns if res[col].dtypes == 'float64']] = res[[
+    col for col in res.columns if df[col].dtypes == 'float64']].astype('string')
 
-'''
-import pyexcel
-
-sheet = pyexcel.get_sheet(file_name="myFile.csv", delimiter=",")
-sheet.save_as("myFile.xlsx")
-'''
+# 파일 저장
+res.to_csv(output_csv_file, index=False, header=True)
+res.to_excel(output_xl_file, index=False, header=True)
