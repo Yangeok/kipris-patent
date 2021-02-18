@@ -1,4 +1,3 @@
-import { SingleBar } from 'cli-progress'
 import { Page } from 'playwright'
 import path from 'path'
 import csv from 'csvtojson'
@@ -8,7 +7,7 @@ import dotenv from 'dotenv'
 import { getCorpName, getCorpDetailInfo, getCorpFinancialInfo, getIsPublic, getCorpMarketInfo, getCorpsFromPatents } from './getDetail'
 import { saveCorpDetail } from './saveDetail'
 
-import { csvWriteHeader, currenyFormatter } from '../../utils'
+import { csvWriteHeader } from '../../utils'
 import { getPlaywright, getProgressBar } from '../../middlewares'
 import { corpOutlineFields } from '../../constants'
 
@@ -81,9 +80,8 @@ export async function getCorpInfo ({ startDate, endDate, outputPath }: { startDa
   // 출원인 가져오기 위한 파일 정제 작업
   const filePath = `patent-${startDate}-${endDate}.csv`
 
-  const fields = corpOutlineFields
   const file = fs.createWriteStream(path.join(__dirname, outputPath, `corp-${startDate}-${endDate}.csv`), 'utf-8')
-  file.write(csvWriteHeader(fields))
+  file.write(csvWriteHeader(corpOutlineFields))
 
   const arr: any[][] = []
   await csv({ delimiter: ';' })

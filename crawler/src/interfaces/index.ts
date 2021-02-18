@@ -77,7 +77,7 @@ export interface IFamilyPatent extends IApplicationNumber {
 export interface ICorpNumber {
   corpNumber: string | number
 }
-export interface ICorpOutline extends IApplicantNumber, ICorpNumber, ICorpFinance {
+export interface ICorpOutline extends IApplicantNumber, ICorpNumber {
   businessNumber: string | number
   repName: string
   estDate: string | Date
@@ -90,11 +90,6 @@ export interface ICorpOutline extends IApplicantNumber, ICorpNumber, ICorpFinanc
   isExtAudit: string | boolean
   isClose: string | boolean
   isPublic: string | boolean
-}
-export interface ICorpMarket extends ICorpNumber {
-  marketCap: string | number
-}
-export interface ICorpFinance {
   totalSales: string | number
   bizProfits: string | number
   crtmNetIncome: string | number
@@ -102,6 +97,22 @@ export interface ICorpFinance {
   liabilities: string | number
   capital: string | number
   employees: string | number
+}
+
+export interface ICorpFinance extends ICorpNumber {
+  totalAssets: string // json 
+  currentAssets: string // json
+  currentLiabilities: string // json
+  totalEquity: string // json
+  issuedCapital: string // json
+  totalLiabilities: string // json
+  nonCurrentAsset: string // json
+  nonCurrentLiabilities: string // json
+  earningSurplus: string // json
+  operatingIncome: string // json
+  profit: string // json
+  profitBeforeTax: string // json
+  revenue: string // json
 }
 
 // Common

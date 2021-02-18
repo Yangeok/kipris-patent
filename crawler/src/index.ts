@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-import { getCorpInfo, getPatentInfo } from './crawler'
+import { getCorpInfo, getPatentInfo, getFinanceInfo } from './crawler'
 
 (async function () {
   const startDate = '20200101'
@@ -8,6 +8,7 @@ import { getCorpInfo, getPatentInfo } from './crawler'
   const outputPath = '../../../../outputs'
   const startPage = 1
 
-  await getPatentInfo({ startDate, endDate, outputPath, startPage })
+  // await getPatentInfo({ startDate, endDate, outputPath, startPage })
   // await getCorpInfo({ startDate, endDate, outputPath })
+  await getFinanceInfo({ startDate, endDate, outputPath })
 })()
