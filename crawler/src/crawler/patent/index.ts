@@ -15,6 +15,7 @@ import { patentFiles, citatingFields, citatedFields, familyPatentFields, } from 
 async function getList(page: Page, barl: SingleBar, params: {
   startDate: string, 
   endDate: string, 
+  startPage: number,
   files: IFile[],
   fields: {
     citatingFields: Array<keyof ICitating>,
@@ -54,11 +55,22 @@ async function getList(page: Page, barl: SingleBar, params: {
   while (currentPage < contentsCount.totalPage) {
     barl.start(contentsCount.totalPage, currentPage)
     await page.waitForSelector('.board_pager03')
-    Promise.all([
-      await getListData(page, params),
-      await page.$eval('.board_pager03 strong', el => (el.nextElementSibling as HTMLElement).click()),
-      await page.waitForSelector('#loadingBarBack', { state: 'hidden' }),
-    ])
+    
+    console.log({ startPage: params.startPage, currentPage })
+    fs.writeFile('../current_page.log', String(currentPage), err => err && console.log(err))
+
+    if (params.startPage > currentPage) {
+      Promise.all([
+        await page.$eval('.board_pager03 strong', el => (el.nextElementSibling as HTMLElement).click()),
+        await page.waitForSelector('#loadingBarBack', { state: 'hidden' })
+      ])
+    } else {
+      Promise.all([
+        await getListData(page, params),
+        await page.$eval('.board_pager03 strong', el => (el.nextElementSibling as HTMLElement).click()),
+        await page.waitForSelector('#loadingBarBack', { state: 'hidden' }),
+      ])
+    }
     currentPage += 1
   }
 }
@@ -77,7 +89,7 @@ async function getListData(page: Page, params: {
   
   // 요약 리스트 수집
   const summaries = await getDataSummaries(page)
-  await summaries.reduce(async (prevPromise, i, idx) => {
+  await summaries.reduce(async (prevPromise, i) => {
     await prevPromise
     const details = await getDataDetails({
       applicationNumber: i.applicationNumber,
@@ -250,7 +262,17 @@ async function getDataDetails(params: {
   }
 }
 
-export async function getPatentInfo ({ startDate, endDate, outputPath }: { startDate: string, endDate: string, outputPath: string }) {
+export async function getPatentInfo ({ 
+  startDate, 
+  endDate, 
+  outputPath, 
+  startPage 
+}: { 
+  startDate: string, 
+  endDate: string, 
+  outputPath: string, 
+  startPage: number 
+}) {
   const files = patentFiles.map(i => {
     const filePath = path.join(__dirname, outputPath, `${i.name}-${startDate}-${endDate}.csv`)
     const file = fs.createWriteStream(filePath, 'utf-8')
@@ -273,7 +295,8 @@ export async function getPatentInfo ({ startDate, endDate, outputPath }: { start
     startDate, 
     endDate, 
     files,
-    fields
+    fields,
+    startPage
   }
 
   const barl = getProgressBar()
