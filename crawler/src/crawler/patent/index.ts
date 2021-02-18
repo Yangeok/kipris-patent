@@ -102,6 +102,7 @@ async function getListData(page: Page, params: {
       ...i,
       ...details?.bibliographic,
       applicants: JSON.stringify(details?.applicants),
+      applicantNumber: details?.applicants[0].number,
       inventors: JSON.stringify(details?.inventors),
       claims: JSON.stringify(details?.claims),
       ipcs: JSON.stringify(details?.ipcs),
