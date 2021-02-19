@@ -61,6 +61,9 @@ async function getData({
     delayPromise(await axios.get(`${baseUrl}getIncoStat?serviceKey=${apiKey}&crno=${corpNumber}&bizYear=${bizYear}&resultType=json&numOfRows=10`), 500)
   ])
 
+  if (json01.response.body.items.item.length < 1 || json02.response.body.items.item.length < 1) {
+    return
+  }
   const bs = await getBs(json01.response.body.items.item)
   const incoStat = await getIncoStat(json02.response.body.items.item)
 
@@ -96,7 +99,9 @@ export async function getFinanceInfo ({
 
     barl.start(corpNumbers[0].length, idx + 1)
     const result = await getData({ corpNumber: i.corpNumber, startDate })
-    file.write(saveFinanceDetail(i, result), err => err && console.log(`> saving file err`))
+    if (result !== undefined) {
+      file.write(saveFinanceDetail(i, result), err => err && console.log(`> saving file err`))
+    }
 
     return
   }, Promise.resolve())
