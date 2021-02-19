@@ -10,12 +10,12 @@ export const getBibliographic = (html: any) => {
     ? i.nextElementSibling.innerText.replace(/\n/g, '').replace(/\t/g, '').replace(/  /g, '')
     : i.nextSibling.textContent.replace(/\n/g, '').replace(/\s/g, '')
   )
-  const pubTableData = [...(newDocument).querySelectorAll('.detial_plan_info li')][5] ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText : ''
+  const pubTableData = [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText !== undefined ? [...(newDocument).querySelectorAll('.detial_plan_info li')][5].innerText : ''
   const bibliographic = {
     registerNumber: tableData[4].split('(')[0], // 등록번호
     registerDate: tableData[4].split('(')[1] !== undefined ? tableData[4].split('(')[1]?.replace(')', '').replace(/\./g, '-') : '', // 등록일자
     publishNumber: pubTableData.split('(65) 공개번호/일자 ')[1] !== undefined ? pubTableData.split('(65) 공개번호/일자 ')[1].split(' (')[0].replace(/\n/g, '').replace(/\t/g, '').replace(/[^0-9]/g, '') : '', // 공개번호
-    publishDate: pubTableData.split('(65) 공개번호/일자 ')[1].split(' (')[1] !== undefined ? pubTableData.split('(65) 공개번호/일자 ')[1].split(' (')[1].replace(/\./g, '-').replace(')', '').replace(/\n/g, '').replace(/\t/g, '').replace(/  /g, '') : '', // 공개일자 // TODO: 
+    publishDate: pubTableData.split('(65) 공개번호/일자 ')[1].split(' (')[1] !== undefined ? pubTableData.split('(65) 공개번호/일자 ')[1].split(' (')[1].replace(/\./g, '-').replace(')', '').replace(/\n/g, '').replace(/\t/g, '').replace(/  /g, '') : '', // 공개일자
     // 공고번호
     // 공고일자
     intlApplNumber: tableData[7].split('(')[0] !== undefined ? tableData[8].split('(')[0]: '', // 국제출원번호
