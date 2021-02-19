@@ -14,4 +14,5 @@ export const patentFiles = [{
 
 // Corporation
 export const corpOutlineFields: Array<keyof ICorpOutline> = ['applicantNumber', 'corpNumber', 'businessNumber', 'repName', 'estDate', 'address', 'corpName', 'corpScale', 'corpForm', 'indCat', 'nationality', 'isExtAudit', 'isClose', 'isPublic', 'bizProfits', 'crtmNetIncome', 'assets', 'liabilities', 'capital', 'employees', 'totalSales', 'bizProfits', 'crtmNetIncome', 'assets', 'liabilities', 'capital', 'employees']
-export const corpFinanceDetailFields: Array<keyof ICorpFinance> = ['corpNumber', 'totalAssets', 'currentAssets', 'currentLiabilities', 'totalEquity', 'issuedCapital', 'totalLiabilities', 'nonCurrentAsset', 'nonCurrentLiabilities', 'earningSurplus', 'operatingIncome', 'profit', 'profitBeforeTax', 'revenue']
+export const corpFinanceDetailFields: Array<keyof ICorpFinance> = ['corpNumber', 'applicantNumber', 'bs', 'incoStat']
+// ['corpNumber', 'totalAssets', 'currentAssets', 'currentLiabilities', 'totalEquity', 'issuedCapital', 'totalLiabilities', 'nonCurrentAsset', 'nonCurrentLiabilities', 'earningSurplus', 'operatingIncome', 'profit', 'profitBeforeTax', 'revenue']

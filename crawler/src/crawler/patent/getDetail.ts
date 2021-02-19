@@ -79,7 +79,7 @@ export const getApplicants = (html: any) => {
       nationality: i.querySelector('.nationality').innerText,
       address: i.querySelector('.txt_left').innerText.replace('...', '')
     }
-  })
+  }).filter(i => i.number.charAt(0) === '1')
   return applicants
 }
 export const getInventors = (html: any) => {
