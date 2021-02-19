@@ -14,56 +14,35 @@ dotenv.config()
 const apiKey = process.env.DATA_PORTAL_API_KEY as string
 const baseUrl = 'http://apis.data.go.kr/1160100/service/GetFinaStatInfoService/'
 
-async function getAcitAmt(json: any) {
-//   [
-//     '자산총계',
-//     '유동자산',
-//     '유동부채',
-//     '자본총계',
-//     '자본금',
-//     '부채총계',
-//     '비유동자산',
-//     '비유동부채',
-//     '이익잉여금(결손금)',
-//     '자산총계'
-//   ]
-//   [
-//   '영업이익',
-//   '당기순이익(손실)',
-//   '법인세비용차감전순이익(손실)',
-//   '매출액',
-//   '영업이익',
-//   '당기순이익(손실)',
-//   '법인세비용차감전순이익(손실)',
-//   '매출액'
-// ]
-  const bs = [
-    '자산총계',
-    '유동자산',
-    '유동부채',
-    '자본총계',
-    '자본금',
-    '부채총계',
-    '비유동자산',
-    '비유동부채',
-    '이익잉여금(결손금)',
-    '자산총계'
-  ]
-  const incoStat = [
-    '영업이익',
-    '당기순이익(손실)',
-    '법인세비용차감전순이익(손실)',
-    '매출액',
-    '영업이익',
-    '당기순이익(손실)',
-    '법인세비용차감전순이익(손실)',
-    '매출액'
-  ]
-  return {
-    crtmAcitAmt: json.crtmAcitAmt ? json.crtmAcitAmt : '',
-    pvtrAcitAmt: json.pvtrAcitAmt ? json.pvtrAcitAmt : '',
-    bpvtrAcitAmt: json.pvtrAcitAmt ? json.pvtrAcitAmt : '',
+async function getBs(arr: any) {
+  const data = arr.map(({ acitNm, crtmAcitAmt, pvtrAcitAmt, bpvtrAcitAmt }: any) => ({ name: acitNm, crtmAcitAmt, pvtrAcitAmt, bpvtrAcitAmt }))
+
+  const result = {
+    currentAssets: data[1] ? data[1] : {},
+    nonCurrentAsset: data[6] ? data[6] : {},
+    currentLiabilities: data[2] ? data[2] : {},
+    totalEquity: data[3] ? data[3] : {},
+    issuedCapital: data[4] ? data[4] : {},
+    totalLiabilities: data[5] ? data[5] : {},
+    nonCurrentLiabilities: data[7] ? data[7] : {},
+    earningSurplus: data[8] ? data[8] : {},
+    totalAssets: data[0] ? data[0] : {},
   }
+
+  return result
+}
+
+async function getIncoStat(arr: any) {
+  const data = arr.map(({ acitNm, crtmAcitAmt, pvtrAcitAmt, bpvtrAcitAmt }: any) => ({ name: acitNm, crtmAcitAmt, pvtrAcitAmt, bpvtrAcitAmt }))
+  
+  const result = {
+    revenue: data[0] ? data[0] : {},
+    operatingIncome: data[1] ? data[1] : {},
+    profitBeforeTax: data[2] ? data[2] : {},
+    profit: data[3] ? data[3] : {},
+  }
+
+  return result
 }
 
 async function getData({
@@ -78,14 +57,12 @@ async function getData({
     { data: json01 },
     { data: json02 }
   ] = await Promise.all([
-    delayPromise(await axios.get(`${baseUrl}getBs?serviceKey=${apiKey}&crno=1101112095837&bizYear=${bizYear}&resultType=json&numOfRows=10`), 500),
-    delayPromise(await axios.get(`${baseUrl}getIncoStat?serviceKey=${apiKey}&crno=1101112095837&bizYear=${bizYear}&resultType=json&numOfRows=10`), 500)
+    delayPromise(await axios.get(`${baseUrl}getBs?serviceKey=${apiKey}&crno=${corpNumber}&bizYear=${bizYear}&resultType=json&numOfRows=10`), 500),
+    delayPromise(await axios.get(`${baseUrl}getIncoStat?serviceKey=${apiKey}&crno=${corpNumber}&bizYear=${bizYear}&resultType=json&numOfRows=10`), 500)
   ])
-  console.log(json01.response.body.items.item)
-  console.log(json02.response.body.items.item)
 
-  const bs = await getAcitAmt(json01.response.body.items.item)
-  const incoStat = await getAcitAmt(json02.response.body.items.item)
+  const bs = await getBs(json01.response.body.items.item)
+  const incoStat = await getIncoStat(json02.response.body.items.item)
 
   return { bs, incoStat }
 }
@@ -107,17 +84,20 @@ export async function getFinanceInfo ({
   const corpNumbers: any[] = []
   await csv({ delimiter: ';' })
     .fromFile(path.join(__dirname, outputPath, filePath))
-    .then(json => corpNumbers.push(json.map(i => i.corpNumber)))
+    .then(json => corpNumbers.push(json.map(i => ({
+      corpNumber: i.corpNumber,
+      applicantNumber: i.applicantNumber
+    }))))
 
   const barl = getProgressBar()
-  await corpNumbers.reduce(async (prevPromise: any, i: any, idx: number) => {
+  
+  await corpNumbers[0].reduce(async (prevPromise: any, i: { corpNumber: string, applicantNumber: string }, idx: number) => {
     await prevPromise
-    barl.start(corpNumbers[0].length, idx)
-    const result = await getData({ corpNumber: i[idx], startDate })
-    
-    if (result) {
-      file.write(saveFinanceDetail(i[idx], result), err => err && console.log(`> saving file err`))
-    }
-    return result
+
+    barl.start(corpNumbers[0].length, idx + 1)
+    const result = await getData({ corpNumber: i.corpNumber, startDate })
+    file.write(saveFinanceDetail(i, result), err => err && console.log(`> saving file err`))
+
+    return
   }, Promise.resolve())
 }

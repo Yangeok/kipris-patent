@@ -99,20 +99,22 @@ export interface ICorpOutline extends IApplicantNumber, ICorpNumber {
   employees: string | number
 }
 
-export interface ICorpFinance extends ICorpNumber {
-  totalAssets: string // json 
-  currentAssets: string // json
-  currentLiabilities: string // json
-  totalEquity: string // json
-  issuedCapital: string // json
-  totalLiabilities: string // json
-  nonCurrentAsset: string // json
-  nonCurrentLiabilities: string // json
-  earningSurplus: string // json
-  operatingIncome: string // json
-  profit: string // json
-  profitBeforeTax: string // json
-  revenue: string // json
+export interface ICorpFinance extends ICorpNumber, IApplicantNumber {
+  bs: string // json
+  incoStat: string // json
+  // totalAssets: string // json 
+  // currentAssets: string // json
+  // currentLiabilities: string // json
+  // totalEquity: string // json
+  // issuedCapital: string // json
+  // totalLiabilities: string // json
+  // nonCurrentAsset: string // json
+  // nonCurrentLiabilities: string // json
+  // earningSurplus: string // json
+  // operatingIncome: string // json
+  // profit: string // json
+  // profitBeforeTax: string // json
+  // revenue: string // json
 }
 
 // Common
