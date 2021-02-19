@@ -101,7 +101,7 @@ export async function getCorpInfo ({ startDate, endDate, outputPath }: { startDa
     }
     
     await prevPromise
-    barl.start(corporations.length, idx)
+    barl.start(corporations.length, idx + 1)
     if (Number(i.number.charAt(0)) !== 5) {
       const result = await getList(page, params)
 
