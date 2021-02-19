@@ -157,7 +157,7 @@ async function getDataSummaries(page: Page) {
       const bottom = i.querySelector('#mainsearch_info_list') as Element
 
       return {
-        inventionTitle: top.querySelector('.stitle a[title="새창으로 열림"]')?.innerHTML.replace(/\;/g, ''),
+        inventionTitle: top.querySelector('.stitle a[title="새창으로 열림"]')?.innerHTML.replace(/\;/g, '').replace(/\,/g, ''),
         applicationNumber: (bottom.querySelector('.left_width[style="width: 54%;"] .point01') as HTMLElement)?.innerText.replace(')', '').replace(/\./g, '-').split(' (')[0],
         applicationDate: (bottom.querySelector('.left_width[style="width: 54%;"] .point01') as HTMLElement)?.innerText.replace(')', '').replace(/\./g, '-').split(' (')[1],
         registerStatus: top.querySelector('#iconStatus')?.innerHTML
