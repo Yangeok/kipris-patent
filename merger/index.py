@@ -27,6 +27,7 @@ df1_dtype = {
 df2_dtype = {
   'corpNumber': str, 
   'applicantNumber': str, 
+  'applicantNumber.1': str, 
   'businessNumber': str
 }
 
@@ -34,7 +35,7 @@ df1 = pd.read_csv(input_patent_file, delimiter=';', dtype=df1_dtype)
 df2 = pd.read_csv(input_corp_file, delimiter=';', dtype=df2_dtype)
 
 # 파일 병합
-df = pd.merge(df1, df2, how='outer', on='applicantNumber')
+df = pd.merge(df1, df2, how='outer', on='applicantNumber').drop_duplicates(keep='first')
 
 # 타입 통일
 df[[col for col in df.columns if df[col].dtypes == object]] = df[[
