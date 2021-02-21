@@ -16,10 +16,13 @@ output_xl_file = f'./{start_date}-{end_date}.xlsx'
 output_csv_file = f'./{start_date}-{end_date}.csv'
 
 df1_dtype = {
+  'applicationNumber': str, 
   'applicantNumber': str, 
+  'registerNumber': str, 
   'publishNumber': str, 
   'intlApplNumber': str, 
-  'intlPublishNumber': str
+  'intlPublishNumber': str,
+  'claimCount': str
 }
 df2_dtype = {
   'corpNumber': str, 
