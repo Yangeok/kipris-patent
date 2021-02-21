@@ -43,13 +43,14 @@ async function getList(page: Page, params: {
   }
   
   // 검색결과 슬라이싱
-  await page.waitForTimeout(1500)
+  await page.waitForTimeout(2000)
   const notFound = await page.$('.not-found-message')
   if (notFound) {
     return
   }
-
+  
   // 첫번째 검색결과 클릭
+  await page.waitForSelector('.company-content .name span')
   const notFound2 = await page.evaluate(() => {
     const firstResult = document.querySelector('.company-content .name span') as HTMLElement
     if (firstResult !== null) {
