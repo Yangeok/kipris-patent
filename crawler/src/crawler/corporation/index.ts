@@ -64,19 +64,24 @@ async function getList(page: Page, params: {
 
   await page.waitForTimeout(3000)
   await page.waitForSelector('.nav-tab-menu.company-tabs')
-
-  // 재무정보 클릭
-  await Promise.all([
-    await page.evaluate(() => {
-      (Array.from(document.querySelectorAll('#tabs .items a')).filter(i => (i as HTMLElement).innerText.includes('재무 정보'))[0] as HTMLElement).click()
-    }),
-    await page.waitForSelector('#income-statement .rt-tbody .rt-tr'),
-    await page.waitForSelector('#financial-statements .rt-tbody .rt-tr')
-  ])
-
+  
   const name = await getCorpName(page)
   const isPublic = await getIsPublic(page)
   const details = await getCorpDetailInfo(page)
+
+  // 재무정보 클릭
+  try {
+    await Promise.all([
+      await page.evaluate(() => {
+        (Array.from(document.querySelectorAll('#tabs .items a')).filter(i => (i as HTMLElement).innerText.includes('재무 정보'))[0] as HTMLElement).click()
+      }),
+      await page.waitForSelector('#income-statement .rt-tbody .rt-tr'),
+      await page.waitForSelector('#financial-statements .rt-tbody .rt-tr')
+    ])
+  } catch(e) {
+    return { name, isPublic, details, incomeStatement: {}, financialStatement: {} }
+  }
+
   const incomeStatement = await getIncomeStatement(page, koreanIncomeStatementFields)
   const financialStatement = await getFinancialStatement(page, koreanFinancialStatementFields)
 
