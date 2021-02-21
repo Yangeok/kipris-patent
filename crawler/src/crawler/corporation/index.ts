@@ -4,10 +4,10 @@ import csv from 'csvtojson'
 import fs from 'fs'
 import dotenv from 'dotenv'
 
-import { getCorpName, getCorpDetailInfo, getCorpFinancialInfo, getIsPublic, getCorpMarketInfo, getCorpsFromPatents } from './getDetail'
+import { getCorpName, getCorpDetailInfo, getIsPublic, getCorpsFromPatents, getIncomeStatement, getFinancialStatement } from './getDetail'
 import { saveCorpDetail } from './saveDetail'
 
-import { csvWriteHeader } from '../../utils'
+import { csvWriteHeader, Indexable } from '../../utils'
 import { getPlaywright, getProgressBar } from '../../middlewares'
 import { corpOutlineFields } from '../../constants'
 
@@ -33,8 +33,7 @@ async function getUserSession (page: Page) {
 }
 
 async function getList(page: Page, params: {
-  corpName: string, 
-  filePath: string
+  corpName: string
 }) {
   // 검색
   await page.waitForSelector('.search-bar')
@@ -43,17 +42,15 @@ async function getList(page: Page, params: {
   if (searchButton) {
     await searchButton?.click()
   }
-  // await page.click('.icon-search')
   
   // 검색결과 슬라이싱
-  await page.waitForTimeout(2000)
+  await page.waitForTimeout(1500)
   const notFound = await page.$('.not-found-message')
   if (notFound) {
     return
   }
 
   // 첫번째 검색결과 클릭
-  // await page.click('.company-content .name span')
   const notFound2 = await page.evaluate(() => {
     const firstResult = document.querySelector('.company-content .name span') as HTMLElement
     if (firstResult !== null) {
@@ -65,46 +62,63 @@ async function getList(page: Page, params: {
   if (notFound2) {
     return
   }
-  await page.waitForTimeout(2000)
+
+  await page.waitForTimeout(3000)
+  await page.waitForSelector('.nav-tab-menu.company-tabs')
+
+  // 재무정보 클릭
+  await Promise.all([
+    await page.evaluate(() => {
+      (Array.from(document.querySelectorAll('#tabs .items a')).filter(i => (i as HTMLElement).innerText.includes('재무 정보'))[0] as HTMLElement).click()
+    }),
+    await page.waitForSelector('#income-statement .rt-tbody .rt-tr'),
+    await page.waitForSelector('#financial-statements .rt-tbody .rt-tr')
+  ])
 
   const name = await getCorpName(page)
   const isPublic = await getIsPublic(page)
   const details = await getCorpDetailInfo(page)
-  const financials = await getCorpFinancialInfo(page)
-  // const markets = await getCorpMarketInfo(page)
+  const incomeStatement = await getIncomeStatement(page)
+  const financialStatement = await getFinancialStatement(page)
 
-  return { name, isPublic, details, financials }
+  // 탭 닫기
+  await page.click('.tab-layout-container .active .delete-tab')
+
+  return { name, isPublic, details, incomeStatement, financialStatement }
 }
 
-export async function getCorpInfo ({ startDate, endDate, outputPath }: { startDate: string, endDate: string, outputPath: string }) {
-  // 출원인 가져오기 위한 파일 정제 작업
-  const filePath = `patent-${startDate}-${endDate}.csv`
-
-  const file = fs.createWriteStream(path.join(__dirname, outputPath, `corp-${startDate}-${endDate}.csv`), 'utf-8')
-  file.write(csvWriteHeader(corpOutlineFields))
-
+async function getPatentArrFromCsv ({
+  outputPath,
+  filePath
+}: {
+  outputPath: string
+  filePath: string
+}) {
   const arr: any[][] = []
   await csv({ delimiter: ';' })
     .fromFile(path.join(__dirname, outputPath, filePath))
     .then(json => arr.push(json))
 
-  const corporations = getCorpsFromPatents(arr)
+  return arr
+}
+
+export async function getCorpInfo ({ startDate, endDate, outputPath }: { startDate: string, endDate: string, outputPath: string }) {
+  const filePath = `patent-${startDate}-${endDate}.csv`
+  const file = fs.createWriteStream(path.join(__dirname, outputPath, `corp-${startDate}-${endDate}.csv`), 'utf-8')
+  file.write(csvWriteHeader(corpOutlineFields))
 
   const barl = getProgressBar()
   const { page } = await getPlaywright()
   await getUserSession(page)
-
-  await corporations.reduce(async (prevPromise: any, i: any, idx: number) => {
-    const params = {
-      filePath,
-      corpName: i.name
-    }
-    
+  
+  const arr = await getPatentArrFromCsv({ outputPath, filePath })
+  const corporations = getCorpsFromPatents(arr)
+  await corporations.reduce(async (prevPromise: any, i: any, idx: number) => {  
     await prevPromise
     barl.start(corporations.length, idx + 1)
     if (Number(i.number.charAt(0)) !== 5) {
-      const result = await getList(page, params)
-
+      const result = await getList(page, { corpName: i.name })
+      console.log(result)
       if (result) {
         file.write(saveCorpDetail(i, result), err => err && console.log(`> saving file err`))
       }
