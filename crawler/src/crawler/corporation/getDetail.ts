@@ -87,8 +87,7 @@ export async function getIncomeStatement (page: Page) {
         return (acc[cur[0]] = cur
           .slice(1, cur.length)
           .reverse()
-          .map(i => i.replace(/\,/g, '')
-          ), acc)
+          .map(i => i.replace(/\,/g, '').replace(/\-/g, '0')), acc)
       }, {})
 
     return result
@@ -112,7 +111,7 @@ export async function getFinancialStatement (page: Page) {
         return (acc[cur[0]] = cur
           .slice(1, cur.length)
           .reverse()
-          .map(i => i.replace(/\,/g, '')), acc)
+          .map(i => i.replace(/\,/g, '').replace(/\-/g, '0')), acc)
       }, {})
 
     return result
