@@ -119,32 +119,6 @@ async function getListData(page: Page, params: {
     fs.appendFile(params.files[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
     return result
 
-    // // 출원인
-    // const applicants = details?.applicants.map(i => Object.values(i).join(';')).join('\n') as string
-    // fs.appendFile(params.files.filter(i => i.name === 'patent-applicant')[0].filePath, applicants + '\n', err => err && console.log(`> saving file err`))
-    
-    // // 서지정보
-    // fs.appendFile(params.files.filter(i => i.name === 'patent-bibliographic')[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
-    
-    // // 발명인
-    // const inventors = details?.inventors.map(i => Object.values(i).join(';')).join('\n') as string
-    // fs.appendFile(params.files.filter(i => i.name === 'patent-inventor')[0].filePath, inventors + '\n', err => err && console.log(`> saving file err`))
-    
-    // // 청구항
-    // const claims = details?.claims.join('\n') as string
-    // fs.appendFile(params.files.filter(i => i.name === 'patent-claim')[0].filePath, claims + '\n', err => err && console.log(`> saving file err`))
-    
-    // // 인용 특허
-    // const citating = details?.citatingPatents[0] !== '' ? details?.citatingPatents.map(i => Object.values((<any>i)).join(';')).join('\n') + '\n' as string : undefined
-    // fs.appendFile(params.files.filter(i => i.name === 'patent-citating')[0].filePath, citating !== undefined ? citating : '', err => err && console.log(`> saving file err`))
-    
-    // // 피인용 특허
-    // const citated = details?.citatedPatents[0] !== '' ? details?.citatedPatents.map(i => Object.values((<any>i)).join(';')).join('\n') as string : undefined
-    // fs.appendFile(params.files.filter(i => i.name === 'patent-citated')[0].filePath, citated !== undefined ? citated + '\n' : '', err => err && console.log(`> saving file err`))
-    
-    // // 패밀리 특허
-    // const family = details?.familyPatents !== [] ? details?.familyPatents.map(i => Object.values((<any>i)).join(';')).join('\n') as string : ''
-    // fs.appendFile(params.files.filter(i => i.name === 'patent-family')[0].filePath, family !== '' ? family + '\n': '', err => err && console.log(`> saving file err`))
   }, <any>Promise.resolve())
 }
 
