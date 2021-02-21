@@ -86,28 +86,29 @@ async function getListData(page: Page, params: {
       citatedFields: params.fields.citatedFields,
       familyPatentFields: params.fields.familyPatentFields
     })
-
-    const result = {
-      ...i,
-      ...details?.bibliographic,
-      applicants: JSON.stringify(details?.applicants),
-      applicantNumber: details?.applicants[0].number,
-      inventors: JSON.stringify(details?.inventors),
-      claims: JSON.stringify(details?.claims),
-      ipcs: JSON.stringify(details?.ipcs),
-      cpcs: JSON.stringify(details?.cpcs),
-      citatingPatents: JSON.stringify(details?.citatingPatents),
-      citatedPatents: JSON.stringify(details?.citatedPatents),
-      familyPatents: JSON.stringify(details?.familyPatents)
-    } as IBibliographic
-
+    
     if (details?.applicants === undefined) {
       return
     }
+    Array.from({ length: details?.applicants.length }).map((_, idx) => {
+      const result = {
+        ...i,
+        ...details?.bibliographic,
+        // applicants: JSON.stringify(details?.applicants),
+        applicantNumber: details?.applicants[idx].number,
+        // inventors: JSON.stringify(details?.inventors),
+        // claims: JSON.stringify(details?.claims),
+        ipcs: JSON.stringify(details?.ipcs),
+        cpcs: JSON.stringify(details?.cpcs),
+        citatingPatents: JSON.stringify(details?.citatingPatents),
+        citatedPatents: JSON.stringify(details?.citatedPatents),
+        familyPatents: JSON.stringify(details?.familyPatents)
+      } as IBibliographic       
+      
+      fs.appendFile(params.files[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
+    })
 
-    fs.appendFile(params.files[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))
-    return result
-
+    return
   }, <any>Promise.resolve())
 }
 
@@ -122,11 +123,6 @@ async function getDataDetails(params: {
   const urlParams = [
     ['method', 'biblioMain_biblio'],
     ['applno', params.applicationNumber],
-    // ['applno', '2020180005507'], // 패밀리특허
-    // ['applno', '2020190004255'], // 인용특허
-    // ['applno', '2020190000436'], // 피인용특허
-    // ['applno', '2020190002428'], // 공개번호
-    // ['applno', '2020197000068'], // 국제출원/공개
     ['link', 'N']
   ]
   const url = getURL(baseUrl, urlParams)
@@ -143,7 +139,7 @@ async function getDataDetails(params: {
         { data: html01 },
         // { data: html02 },
         // { data: html03 },
-        { data: html04 },
+        // { data: html04 },
         // { data: html05 },
         { data: html06 },
         { data: html07 },
@@ -152,7 +148,7 @@ async function getDataDetails(params: {
         delayPromise(await axios.get(`${url}&next=biblioViewSub01&getType=BASE`), 500), // 서지정보
         // delayPromise(await axios.get(`${url}&next=biblioViewSub02&getType=Sub02`), 500), // 인명정보
         // delayPromise(await axios.get(`${url}&next=biblioViewSub03&getType=Sub03`), 500), // 행정처리
-        delayPromise(await axios.get(`${url}&next=biblioViewSub04&getType=Sub04`), 500), // 청구항
+        // delayPromise(await axios.get(`${url}&next=biblioViewSub04&getType=Sub04`), 500), // 청구항
         // delayPromise(await axios.get(`${url}&next=biblioViewSub06&getType=Sub06`), 500), // 지정국
         delayPromise(await axios.get(`${url}&next=biblioViewSub07&getType=Sub07`), 500), // 인용/피인용
         delayPromise(await axios.get(`${url}&next=biblioViewSub08&getType=Sub08`), 500), // 패밀리특허
@@ -172,7 +168,7 @@ async function getDataDetails(params: {
       // const document03 = parse(html03)
 
       // 청구항
-      const claims = getClaims(html04)
+      // const claims = getClaims(html04)
     
       // 지정국 
       // const document05 = parse(html05)
@@ -192,8 +188,8 @@ async function getDataDetails(params: {
         ipcs, // IPC
         cpcs, // CPC
         applicants, // 출원인
-        inventors, // 발명자
-        claims, // 청구항
+        // inventors, // 발명자
+        // claims, // 청구항
         citatingPatents, // 인용특허
         citatedPatents, // 피인용특허
         familyPatents // 패밀리특허
