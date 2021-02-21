@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 import { getCorpName, getCorpDetailInfo, getIsPublic, getCorpsFromPatents, getIncomeStatement, getFinancialStatement } from './getDetail'
 import { saveCorpDetail } from './saveDetail'
 
-import { csvWriteHeader, Indexable } from '../../utils'
+import { csvWriteHeader } from '../../utils'
 import { getPlaywright, getProgressBar } from '../../middlewares'
 import { corpOutlineFields } from '../../constants'
 
@@ -15,7 +15,6 @@ dotenv.config()
 
 const username = process.env.DS_USERNAME as string
 const password = process.env.DS_PASSWORD as string
-console.log({ username, password })
 
 async function getUserSession (page: Page) {
   // 로그인 페이지 이동
@@ -116,7 +115,9 @@ export async function getCorpInfo ({ startDate, endDate, outputPath }: { startDa
   await corporations.reduce(async (prevPromise: any, i: any, idx: number) => {  
     await prevPromise
     barl.start(corporations.length, idx + 1)
-    
+
+    fs.writeFile('../current_applicant.log', `${JSON.stringify(i)}\nindex: ${idx}`, err => err && console.log(err))
+
     if (Number(i.number.charAt(0)) !== 5) {
       const result = await getList(page, { corpName: i.name })
       if (result) {

@@ -46,7 +46,7 @@ async function getList(page: Page, barl: SingleBar, params: {
     barl.start(contentsCount.totalPage, currentPage)
     await page.waitForSelector('.board_pager03')
     
-    fs.writeFile('../current_page.log', String(currentPage), err => err && console.log(err))
+    fs.writeFile('../current_page.log', `currentPage: ${String(currentPage)}`, err => err && console.log(err))
 
     if (params.startPage >= currentPage) {
       Promise.all([
