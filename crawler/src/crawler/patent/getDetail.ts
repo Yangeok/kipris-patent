@@ -60,7 +60,7 @@ export const getBibliographic = (html: any) => {
     // 기술이전희망여부
     claimReqDate: tableData[17].split('(')[1] !== undefined ? tableData[17].split('(')[1].replace(/\./g, '-').replace(')', '') : '',// 심사청구일자
     claimCount: tableData[18] !== undefined ? tableData[18].replace(/\t/g, '').replace(/\n/g, ''): '', // 청구항수
-    astrtCont: String(newDocument.querySelector('p[num="0001a"]').innerText.replace(/\n/g, '').replace(/\;/g, '')) // 요약
+    // astrtCont: String(newDocument.querySelector('p[num="0001a"]').innerText.replace(/\n/g, '').replace(/\;/g, '')) // 요약
   }
   return bibliographic
 }
