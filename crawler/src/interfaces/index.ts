@@ -90,31 +90,14 @@ export interface ICorpOutline extends IApplicantNumber, ICorpNumber {
   isExtAudit: string | boolean
   isClose: string | boolean
   isPublic: string | boolean
-  totalSales: string | number
-  bizProfits: string | number
-  crtmNetIncome: string | number
-  assets: string | number
-  liabilities: string | number
-  capital: string | number
-  employees: string | number
-}
-
-export interface ICorpFinance extends ICorpNumber, IApplicantNumber {
-  bs: string // json
-  incoStat: string // json
-  // totalAssets: string // json 
-  // currentAssets: string // json
-  // currentLiabilities: string // json
-  // totalEquity: string // json
-  // issuedCapital: string // json
-  // totalLiabilities: string // json
-  // nonCurrentAsset: string // json
-  // nonCurrentLiabilities: string // json
-  // earningSurplus: string // json
-  // operatingIncome: string // json
-  // profit: string // json
-  // profitBeforeTax: string // json
-  // revenue: string // json
+  revenue: string
+  salesCost: string
+  SellingAndAdmnstExp: string
+  nonOprtIncome: string
+  currentAssets: string
+  nonCurrentAssets: string
+  currentLiabilities: string
+  nonCurrentLiabilities: string
 }
 
 // Common
