@@ -27,7 +27,7 @@ export const patentFiles = [{
   name: 'patent',
   fields: [
     ...bibliographicFields, 
-    'applicants', 
+    // 'applicants', 
     'applicantNumber', 
     // 'inventors', 
     // 'claims', 
@@ -40,6 +40,6 @@ export const patentFiles = [{
 }]
 
 // Corporation
-export const corpOutlineFields: Array<keyof ICorpOutline> = ['applicantNumber', 'corpNumber', 'businessNumber', 'repName', 'estDate', 'address', 'corpName', 'corpScale', 'corpForm', 'indCat', 'nationality', 'isExtAudit', 'isClose', 'isPublic',  'revenue', 'salesCost', 'SellingAndAdmnstExp', 'nonOprtIncome', 'currentAssets', 'nonCurrentAssets', 'currentLiabilities', 'nonCurrentLiabilities']
+export const corpOutlineFields: Array<keyof ICorpOutline> = ['applicantNumber', 'corpNumber', 'businessNumber', 'repName', 'estDate', 'corpName', 'corpScale', 'corpForm', 'indCat', 'nationality', 'isExtAudit', 'isClose', 'isPublic',  'revenue', 'salesCost', 'SellingAndAdmnstExp', 'nonOprtIncome', 'currentAssets', 'nonCurrentAssets', 'currentLiabilities', 'nonCurrentLiabilities']
 export const incomeStatementFields: Array<keyof IIncomeStatement> = ['revenue', 'salesCost', 'SellingAndAdmnstExp', 'nonOprtIncome']
 export const financialStatementFields: Array<keyof IFinancialStatement> = ['currentAssets', 'nonCurrentAssets', 'currentLiabilities', 'nonCurrentLiabilities']
