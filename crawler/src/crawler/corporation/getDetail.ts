@@ -4,9 +4,11 @@ import { fromEntries } from '../../utils'
 
 export function getCorpsFromPatents (arr: any[][]) {
   const result = arr[0]
-    .map(i => JSON.parse(i.applicants))
-    .reduce((acc, value) => acc.concat(value), [])
-    .filter((i: any) => i.number.charAt(0) === '1' || i.number.charAt(0) === '5')
+    // .map(i => i.applicantNumber)  
+    .map(i => ({ 
+      applicantNumber: i.applicantNumber,
+      applicantName: i.applicantName
+    }))
 
   return result
 }
@@ -71,9 +73,7 @@ export async function getCorpMarketInfo (page: Page) {
   return fromEntries(data)
 }
 
-export async function getIncomeStatement (page: Page) {
-  const arr = ['매출액', '매출원가', '매출총이익(손실)', '판매비와관리비', '영업이익(손실)', '영업외수익', '법인세비용차감전계속사업이익(손실)']
-
+export async function getIncomeStatement (page: Page, arr: string[]) {
   const data = await page.evaluate(headers => {
     const years = (document.querySelector('#income-statement .rt-thead.-header .rt-tr') as HTMLElement).innerText.split('\n')
       .filter(i => !i.includes('(증권사 컨센서스 평균)'))
@@ -96,9 +96,7 @@ export async function getIncomeStatement (page: Page) {
   return data
 }
 
-export async function getFinancialStatement (page: Page) {
-  const arr = ['유동자산', '비유동자산', '유동부채', '비유동부채']
-
+export async function getFinancialStatement (page: Page, arr: string[]) {
   const data = await page.evaluate(headers => {
     const years = (document.querySelector('#financial-statements .rt-thead.-header .rt-tr') as HTMLElement).innerText.split('\n')
       .map(i => i.includes('12-31') ? i.split('-')[0] : i)

@@ -9,7 +9,7 @@ import { saveCorpDetail } from './saveDetail'
 
 import { csvWriteHeader } from '../../utils'
 import { getPlaywright, getProgressBar } from '../../middlewares'
-import { corpOutlineFields } from '../../constants'
+import { corpOutlineFields, koreanFinancialStatementFields, koreanIncomeStatementFields } from '../../constants'
 
 dotenv.config()
 
@@ -77,8 +77,8 @@ async function getList(page: Page, params: {
   const name = await getCorpName(page)
   const isPublic = await getIsPublic(page)
   const details = await getCorpDetailInfo(page)
-  const incomeStatement = await getIncomeStatement(page)
-  const financialStatement = await getFinancialStatement(page)
+  const incomeStatement = await getIncomeStatement(page, koreanIncomeStatementFields)
+  const financialStatement = await getFinancialStatement(page, koreanFinancialStatementFields)
 
   // 탭 닫기
   await page.click('.tab-layout-container .active .delete-tab')
@@ -105,27 +105,24 @@ export async function getCorpInfo ({ startDate, endDate, outputPath }: { startDa
   const filePath = `patent-${startDate}-${endDate}.csv`
   const file = fs.createWriteStream(path.join(__dirname, outputPath, `corp-${startDate}-${endDate}.csv`), 'utf-8')
   file.write(csvWriteHeader(corpOutlineFields))
+  
+  const arr = await getPatentArrFromCsv({ outputPath, filePath })
+  const corporations = getCorpsFromPatents(arr)
 
   const barl = getProgressBar()
   const { page } = await getPlaywright()
   await getUserSession(page)
   
-  const arr = await getPatentArrFromCsv({ outputPath, filePath })
-  const corporations = getCorpsFromPatents(arr)
   await corporations.reduce(async (prevPromise: any, i: any, idx: number) => {  
     await prevPromise
     barl.start(corporations.length, idx + 1)
-
+    
     fs.writeFile('../current_applicant.log', `${JSON.stringify(i)}\nindex: ${idx}`, err => err && console.log(err))
 
-    if (Number(i.number.charAt(0)) !== 5) {
-      const result = await getList(page, { corpName: i.name })
-      if (result) {
-        file.write(saveCorpDetail(i, result), err => err && console.log(`> saving file err`))
-      }
-      return result
+    const result = await getList(page, { corpName: i.applicantName })
+    if (result) {
+      file.write(saveCorpDetail(i.applicantNumber, result), err => err && console.log(`> saving file err`))
     }
-
     return
   }, Promise.resolve())
 }

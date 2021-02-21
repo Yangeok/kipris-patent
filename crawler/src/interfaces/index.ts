@@ -80,7 +80,7 @@ export interface ICorpOutline extends IApplicantNumber, ICorpNumber, IIncomeStat
   businessNumber: string | number // 사업자번호
   repName: string // 법인대표자명
   estDate: string | Date // 법인설립일자
-  address: string // 법인주소
+  // address: string // 법인주소
   corpName: string // 법인명
   corpScale: string // 법인규모
   corpForm: string // 법인형태
@@ -96,6 +96,16 @@ export interface IIncomeStatement {
   salesCost: string // 매출원가
   SellingAndAdmnstExp: string // 판매비와관리비
   nonOprtIncome: string // 영업외수익
+  profit: string // 수익
+  grossProfitLoss: string // 매출총이익(손실)
+  operatingProfitLoss: string // 영업이익(손실)
+  poofitBeforeIncomeTaxLoss: string // 법인세비용차감전계속사업이익(손실)
+  incomeTaxExp: string // 계속영업손익법인세비용(부의법인세비용)
+  continuingOperatingProfitLoss: string // 계속영업이익(손실)
+  discontinuedOperatingProfitLoss: string // 중단영업이익(손실)
+  TotalNetIncome: string // 총당기순이익
+  OtherComprehensiveIncome: string // 기타포괄손익
+  ComprehensiveIncome: string // 포괄손익
 }
 
 export interface IFinancialStatement {
@@ -103,6 +113,10 @@ export interface IFinancialStatement {
   nonCurrentAssets: string // 비유동자산
   currentLiabilities: string // 유동부채
   nonCurrentLiabilities: string // 비유동부채
+  totalAassets: string // 자산총계
+  totalLiabilities: string // 부채총계
+  totalEquity: string // 자본총계
+  totalLiabilitiesAndEquity: string // 부채와자본총계
 }
 
 // Common
