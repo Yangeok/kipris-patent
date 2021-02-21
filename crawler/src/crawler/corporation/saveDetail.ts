@@ -7,7 +7,8 @@ export function saveCorpDetail (applicantNumber: string, res: {
     incomeStatement: any
     financialStatement: any
 }) {
-  // `${i.number};${res.details['법인 등록번호'].replace(/\-/g, '')};
+  // `${applicantNumber};
+  // ${res.details['법인 등록번호'].replace(/\-/g, '')};
   // ${res.details['사업자 등록번호'].replace(/\-/g, '')};
   // ${res.details['대표이사']};
   // ${res.details['설립일자'] ? res.details['설립일자'] : ''};
