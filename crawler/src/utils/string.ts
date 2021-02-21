@@ -1,7 +1,5 @@
-import { URLSearchParams } from "url";
-import { Indexable } from "./types";
+import { URLSearchParams } from 'url'
 
-// FIXME: 
 export const getURL = (baseUrl: string, params: string[][]) => {
   const qs = new URLSearchParams()
   params.map(i => qs.set(i[0], i[1]))

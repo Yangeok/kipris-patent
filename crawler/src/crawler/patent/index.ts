@@ -3,14 +3,12 @@ import { Page } from 'playwright'
 import path from 'path'
 import fs from 'fs'
 
-import { getBibliographic, getApplicants, getCpcs, getCitatedPatents, getCitatingPatents, getClaims, getFamilyPatents, getInventors, getIpcs } from './getDetail'
+import { getBibliographic, getApplicants, getCpcs, getCitatedPatents, getCitatingPatents, getClaims, getFamilyPatents, getInventors, getIpcs, getDataSummaries, getContentCount } from './getDetail'
 
 import { csvWriteHeader, Indexable, delayPromise, getURL, axios } from '../../utils'
 import { getProgressBar, getPlaywright } from '../../middlewares'
 import { IBibliographic, ICitating, ICitated, IFamilyPatent, IFile } from '../../interfaces'
 import { patentFiles, citatingFields, citatedFields, familyPatentFields, } from '../../constants'
-
-
 
 async function getList(page: Page, barl: SingleBar, params: {
   startDate: string, 
@@ -35,28 +33,19 @@ async function getList(page: Page, barl: SingleBar, params: {
   await page.evaluate(() => {
     const { document } = (<Indexable>window)
     document.querySelector('#opt28 option[value="30"]').selected = true
-    // document.querySelector('#opt28 option[value="30"]').value = 10
   })
   await page.click('#pageSel img')
   await page.click('#pageSel a')
-
   await page.waitForSelector('#loadingBarBack', { state: 'hidden' })
 
   // 페이지 카운트
-  const contentsCount = await page.evaluate(() => {
-    return {
-      totalCount: Number((document.querySelector('.total') as HTMLElement).innerText.replace(/\,/g, '')),
-      currentPage: Number((document.querySelector('.current') as HTMLElement).innerText),
-      totalPage: Number(((document.querySelector('.articles') as HTMLElement).childNodes[5].nodeValue as string).replace(/[^0-9]/g, ''))
-    }
-  })
+  const contentsCount = await getContentCount(page)
 
   let currentPage = contentsCount.currentPage
   while (currentPage < contentsCount.totalPage) {
     barl.start(contentsCount.totalPage, currentPage)
     await page.waitForSelector('.board_pager03')
     
-    console.log({ startPage: params.startPage, currentPage })
     fs.writeFile('../current_page.log', String(currentPage), err => err && console.log(err))
 
     if (params.startPage >= currentPage) {
@@ -122,24 +111,6 @@ async function getListData(page: Page, params: {
   }, <any>Promise.resolve())
 }
 
-async function getDataSummaries(page: Page) {
-  const data = page.evaluate(() => {    
-    const cards: HTMLElement[] = Array.from(document.querySelectorAll('article[id^="divView"]'))
-    
-    return cards.map(i => {
-      const top = i.querySelector('.search_section_title') as Element
-      const bottom = i.querySelector('#mainsearch_info_list') as Element
-
-      return {
-        inventionTitle: top.querySelector('.stitle a[title="새창으로 열림"]')?.innerHTML.replace(/\;/g, '').replace(/\,/g, ''),
-        applicationNumber: (bottom.querySelector('.left_width[style="width: 54%;"] .point01') as HTMLElement)?.innerText.replace(')', '').replace(/\./g, '-').split(' (')[0],
-        applicationDate: (bottom.querySelector('.left_width[style="width: 54%;"] .point01') as HTMLElement)?.innerText.replace(')', '').replace(/\./g, '-').split(' (')[1],
-        registerStatus: top.querySelector('#iconStatus')?.innerHTML
-      }
-    })
-  })
-  return data
-}
 
 async function getDataDetails(params: { 
   applicationNumber: string, 
@@ -228,7 +199,6 @@ async function getDataDetails(params: {
         familyPatents // 패밀리특허
       }
 
-      // console.log(result)
       return result
     }
     return 

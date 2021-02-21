@@ -116,9 +116,9 @@ export async function getCorpInfo ({ startDate, endDate, outputPath }: { startDa
   await corporations.reduce(async (prevPromise: any, i: any, idx: number) => {  
     await prevPromise
     barl.start(corporations.length, idx + 1)
+    
     if (Number(i.number.charAt(0)) !== 5) {
       const result = await getList(page, { corpName: i.name })
-      console.log(result)
       if (result) {
         file.write(saveCorpDetail(i, result), err => err && console.log(`> saving file err`))
       }

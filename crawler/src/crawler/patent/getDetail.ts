@@ -1,6 +1,38 @@
+import { Page } from 'playwright'
 import { parse } from 'node-html-parser'
 
 import { fromEntries } from '../../utils'
+
+export const getDataSummaries = async (page: Page) => {
+  const data = page.evaluate(() => {    
+    const cards: HTMLElement[] = Array.from(document.querySelectorAll('article[id^="divView"]'))
+    
+    return cards.map(i => {
+      const top = i.querySelector('.search_section_title') as Element
+      const bottom = i.querySelector('#mainsearch_info_list') as Element
+
+      return {
+        inventionTitle: top.querySelector('.stitle a[title="새창으로 열림"]')?.innerHTML.replace(/\;/g, '').replace(/\,/g, ''),
+        applicationNumber: (bottom.querySelector('.left_width[style="width: 54%;"] .point01') as HTMLElement)?.innerText.replace(')', '').replace(/\./g, '-').split(' (')[0],
+        applicationDate: (bottom.querySelector('.left_width[style="width: 54%;"] .point01') as HTMLElement)?.innerText.replace(')', '').replace(/\./g, '-').split(' (')[1],
+        registerStatus: top.querySelector('#iconStatus')?.innerHTML
+      }
+    })
+  })
+  return data
+}
+
+export const getContentCount = async (page: Page) => {
+  const data = await page.evaluate(() => {
+    return {
+      totalCount: Number((document.querySelector('.total') as HTMLElement).innerText.replace(/\,/g, '')),
+      currentPage: Number((document.querySelector('.current') as HTMLElement).innerText),
+      totalPage: Number(((document.querySelector('.articles') as HTMLElement).childNodes[5].nodeValue as string).replace(/[^0-9]/g, ''))
+    }
+  })
+
+  return data
+}
 
 export const getBibliographic = (html: any) => {
   const newDocument = parse(html)
