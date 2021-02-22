@@ -1,8 +1,8 @@
 import { getCorpInfo, getPatentInfo } from './crawler'
 
 (async function () {
-  const startDate = '20200101'
-  const endDate = '20201231'
+  const startDate = '20200501'
+  const endDate = '20200630'
   const outputPath = '../../../../outputs'
   const startPage = 1
 
