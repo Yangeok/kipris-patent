@@ -1,5 +1,6 @@
-****# SA-PATENT-CRAWLER
+# SA-PATENT-CRAWLER
 
+<!-- 
 ### Introduction
 
 #### Kipris
@@ -14,18 +15,33 @@
 
 #### DeepSearch
 
-- 출원인번호가 `1`로 시작하는 경우 딥서치에서 해당 출원인(기업)을 Chromium으로 추출
+- 출원인번호가 `1`로 시작하는 경우 딥서치에서 해당 출원인(기업)을 Chromium으로 추출 -->
 ### Installation & Execution
+
+#### Installation
 
 ```sh
 # common
-mkdir outputs
+mkdir outputs # csv 파일 만들 폴더
 
 # using npm
-npm install && npm start:ch 
+npm install && npm start # 실행 스크립트 
 
 # using yarn
-yarn && yarn start:ch
+yarn && yarn start # 실행 스크립트
+```
+
+#### Execution
+
+```ts
+// crawler/src/index.ts
+
+(...)
+
+const startDate = '20200501' // 수집 시작날짜
+const endDate = '20200630' // 수집 종료날짜
+(...)
+const startPage = 40 // /current_page.log 기준으로 재시도 가능
 ```
 
 ### Response
@@ -94,13 +110,9 @@ yarn && yarn start:ch
 - isExtAudit: 외감여부
 - isClose: 폐업여부
 - isPublic: 상장여부
-- revenue: 매출액
-- salesCost: 매출원가
-- SellingAndAdmnstExp: 판매비와관리비
-- nonOprtIncome: 영업외수익
 - revenue: 매출액 
 - salesCost: 매출원가 
-- SellingAndAdmnstExp: 판매비와관리비 
+- sellingAndAdmnstExp: 판매비와관리비 
 - nonOprtIncome: 영업외수익 
 - profit: 수익
 - grossProfitLoss: 매출총이익(손실)
@@ -110,8 +122,8 @@ yarn && yarn start:ch
 - continuingOperatingProfitLoss: 계속영업이익(손실)
 - discontinuedOperatingProfitLoss: 중단영업이익(손실)
 - TotalNetIncome: 총당기순이익
-- OtherComprehensiveIncome: 기타포괄손익
-- ComprehensiveIncome: 포괄손익
+- otherComprehensiveIncome: 기타포괄손익
+- comprehensiveIncome: 포괄손익
 - currentAssets: 유동자산
 - nonCurrentAssets: 비유동자산
 - currentLiabilities: 유동부채
