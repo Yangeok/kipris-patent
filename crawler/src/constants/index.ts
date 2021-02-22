@@ -73,7 +73,7 @@ export const corpOutlineFields: Array<keyof ICorpOutline> = [
 
   'revenue', // 매출액 
   'salesCost', // 매출원가 
-  'SellingAndAdmnstExp', // 판매비와관리비 
+  'sellingAndAdmnstExp', // 판매비와관리비 
   'nonOprtIncome', // 영업외수익 
   'profit', // 수익
   'grossProfitLoss', // 매출총이익(손실)
@@ -82,9 +82,9 @@ export const corpOutlineFields: Array<keyof ICorpOutline> = [
   'incomeTaxExp', // 계속영업손익법인세비용(부의법인세비용)
   'continuingOperatingProfitLoss', // 계속영업이익(손실)
   'discontinuedOperatingProfitLoss', // 중단영업이익(손실)
-  'TotalNetIncome', // 총당기순이익
-  'OtherComprehensiveIncome', // 기타포괄손익
-  'ComprehensiveIncome', // 포괄손익
+  'totalNetIncome', // 총당기순이익
+  'otherComprehensiveIncome', // 기타포괄손익
+  'comprehensiveIncome', // 포괄손익
   'currentAssets', // 유동자산 
   'nonCurrentAssets', // 비유동자산 
   'currentLiabilities', // 유동부채 
@@ -97,7 +97,7 @@ export const corpOutlineFields: Array<keyof ICorpOutline> = [
 export const incomeStatementFields: Array<keyof IIncomeStatement> = [
   'revenue', // 매출액 
   'salesCost', // 매출원가 
-  'SellingAndAdmnstExp', // 판매비와관리비 
+  'sellingAndAdmnstExp', // 판매비와관리비 
   'nonOprtIncome', // 영업외수익
   'profit', // 수익
   'grossProfitLoss', // 매출총이익(손실)
@@ -106,9 +106,9 @@ export const incomeStatementFields: Array<keyof IIncomeStatement> = [
   'incomeTaxExp', // 계속영업손익법인세비용(부의법인세비용)
   'continuingOperatingProfitLoss', // 계속영업이익(손실)
   'discontinuedOperatingProfitLoss', // 중단영업이익(손실)
-  'TotalNetIncome', // 총당기순이익
-  'OtherComprehensiveIncome', // 기타포괄손익
-  'ComprehensiveIncome', // 포괄손익
+  'totalNetIncome', // 총당기순이익
+  'otherComprehensiveIncome', // 기타포괄손익
+  'comprehensiveIncome', // 포괄손익
 ]
 export const financialStatementFields: Array<keyof IFinancialStatement> = [
   'currentAssets', // 유동자산 

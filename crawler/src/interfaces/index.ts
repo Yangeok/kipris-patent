@@ -94,7 +94,7 @@ export interface ICorpOutline extends IApplicantNumber, ICorpNumber, IIncomeStat
 export interface IIncomeStatement {
   revenue: string // 매출액
   salesCost: string // 매출원가
-  SellingAndAdmnstExp: string // 판매비와관리비
+  sellingAndAdmnstExp: string // 판매비와관리비
   nonOprtIncome: string // 영업외수익
   profit: string // 수익
   grossProfitLoss: string // 매출총이익(손실)
@@ -103,9 +103,9 @@ export interface IIncomeStatement {
   incomeTaxExp: string // 계속영업손익법인세비용(부의법인세비용)
   continuingOperatingProfitLoss: string // 계속영업이익(손실)
   discontinuedOperatingProfitLoss: string // 중단영업이익(손실)
-  TotalNetIncome: string // 총당기순이익
-  OtherComprehensiveIncome: string // 기타포괄손익
-  ComprehensiveIncome: string // 포괄손익
+  totalNetIncome: string // 총당기순이익
+  otherComprehensiveIncome: string // 기타포괄손익
+  comprehensiveIncome: string // 포괄손익
 }
 
 export interface IFinancialStatement {
