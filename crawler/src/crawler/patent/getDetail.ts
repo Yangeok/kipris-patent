@@ -50,10 +50,10 @@ export const getBibliographic = (html: any) => {
     publishDate: pubTableData.split('(65) 공개번호/일자 ')[1].split(' (')[1] ? pubTableData.split('(65) 공개번호/일자 ')[1].split(' (')[1].replace(/\./g, '-').replace(')', '').replace(/\n/g, '').replace(/\t/g, '').replace(/  /g, '') : '', // 공개일자
     // 공고번호
     // 공고일자
-    intlApplNumber: tableData[7].split('(')[0] !== undefined ? tableData[8].split('(')[0]: '', // 국제출원번호
-    intlApplDate: tableData[7].split('(')[1] !== undefined ? tableData[8].split('(')[1]?.replace(/\./g, '-').replace(')', '') : '', // 국제출원일자
-    intlPublishNumber: tableData[8], // 국제공개번호
-    intlPublishDate: tableData[8].split('(')[1] !== undefined ? tableData[8].split('(')[1].replace(/\./g, '-').replace(')', '') : '', // 국제공개일자
+    // intlApplNumber: tableData[7].split('(')[0] !== undefined ? tableData[8].split('(')[0]: '', // 국제출원번호
+    // intlApplDate: tableData[7].split('(')[1] !== undefined ? tableData[8].split('(')[1]?.replace(/\./g, '-').replace(')', '') : '', // 국제출원일자
+    // intlPublishNumber: tableData[8], // 국제공개번호
+    // intlPublishDate: tableData[8].split('(')[1] !== undefined ? tableData[8].split('(')[1].replace(/\./g, '-').replace(')', '') : '', // 국제공개일자
     // 심사진행상태
     // 심판사항
     // 특허구분
@@ -76,7 +76,13 @@ export const getIpcs = (html: any) => {
       code: i.split('(')[0],
       date: i.split('(')[1]?.replace(/\./g, '-')
   })).filter(i => i.date !== undefined)
-  return ipcs
+
+  const refined = ipcs.map((i, idx) => ({ 
+    [`ipcCode_${idx + 1}`]: i.code
+  })) as any
+  const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
+
+  return assigned
 }
 export const getCpcs = (html: any) => {
   const newDocument = parse(html)
@@ -90,7 +96,13 @@ export const getCpcs = (html: any) => {
     code: i.split('(')[0].substr(1),
     date: i.split('(')[1]?.replace(/\./g, '-')
   })).filter(i => i.date !== undefined)
-  return cpcs
+
+  const refined = cpcs.map((i, idx) => ({ 
+    [`ipcCode_${idx + 1}`]: i.code
+  })) as any
+  const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
+
+  return assigned
 }
 export const getApplicants = (html: any) => {
   const newDocument = parse(html)
@@ -169,7 +181,13 @@ export const getCitatingPatents = (html: any, header: string[]) => {
   const citating = citatingValues
     .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))) : '')
 
-  return citating[0] !== '' ? citating : []
+  const refined = citating.map((i, idx) => ({ 
+    [`citatingPublishNumber_${idx + 1}`]: i.publishNumber,
+    [`citatingIpcCode_${idx + 1}`]: i.ipcCode
+  })) as any
+  const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
+  
+  return assigned
 }
 export const getCitatedPatents = (html: any, header: string[]) => {
   const newDocument = parse(html)
@@ -184,7 +202,13 @@ export const getCitatedPatents = (html: any, header: string[]) => {
   const citated = citatedValues
     .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))): '')
 
-  return citated[0] !== '' ? citated : []
+  const refined = citated.map((i, idx) => ({ 
+    [`citatedApplicationNumber_${idx + 1}`]: i.applicationNumber,
+    [`citatedIpcCode_${idx + 1}`]: i.ipcCode
+  })) as any    
+  const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
+
+  return assigned
 }
 export const getFamilyPatents = (html: any, header: string[]) => {
   const newDocument = parse(html)
@@ -199,5 +223,10 @@ export const getFamilyPatents = (html: any, header: string[]) => {
     .filter(i => i.length)
     .map(i => fromEntries(i.map((j, index) => ([ header[index], j]))))
 
-  return familyPatents
+  const refined = familyPatents.map((i, idx) => ({ 
+    [`familyNumber_${idx + 1}`]: i.number,
+  })) as any
+
+  const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
+  return assigned
 }

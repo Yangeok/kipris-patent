@@ -99,11 +99,40 @@ async function getListData(page: Page, params: {
         applicantName: details?.applicants[idx].name,
         // inventors: JSON.stringify(details?.inventors),
         // claims: JSON.stringify(details?.claims),
-        ipcs: JSON.stringify(details?.ipcs),
-        cpcs: JSON.stringify(details?.cpcs),
-        citatingPatents: JSON.stringify(details?.citatingPatents),
-        citatedPatents: JSON.stringify(details?.citatedPatents),
-        familyPatents: JSON.stringify(details?.familyPatents)
+        // ipcs: JSON.stringify(details?.ipcs),
+        // cpcs: JSON.stringify(details?.cpcs),
+        // citatingPatents: JSON.stringify(details?.citatingPatents),
+        // citatedPatents: JSON.stringify(details?.citatedPatents),
+        // familyPatents: JSON.stringify(details?.familyPatents)
+        ipcCode_1: details?.ipcs.ipcCode_1 || '',
+        ipcCode_2: details?.ipcs.ipcCode_2 || '',
+        ipcCode_3: details?.ipcs.ipcCode_3 || '',
+        ipcCode_4: details?.ipcs.ipcCode_4 || '',
+        ipcCode_5: details?.ipcs.ipcCode_5 || '',
+
+        cpcCode_1: details.cpcs.cpcCode_1 || '',
+        cpcCode_2: details.cpcs.cpcCode_2 || '',
+        cpcCode_3: details.cpcs.cpcCode_3 || '',
+        cpcCode_4: details.cpcs.cpcCode_4 || '',
+        cpcCode_5: details.cpcs.cpcCode_5 || '',
+
+        citatingIpcCode_1: details.citatingPatents.citatingIpcCode_1 || '',
+        citatingIpcCode_2: details.citatingPatents.citatingIpcCode_2 || '',
+        citatingIpcCode_3: details.citatingPatents.citatingIpcCode_3 || '',
+        citatingIpcCode_4: details.citatingPatents.citatingIpcCode_4 || '',
+        citatingIpcCode_5: details.citatingPatents.citatingIpcCode_5 || '',
+        
+        citatedIpcCode_1: details.citatedPatents.citatedIpcCode_1 || '',
+        citatedIpcCode_2: details.citatedPatents.citatedIpcCode_2 || '',
+        citatedIpcCode_3: details.citatedPatents.citatedIpcCode_3 || '',
+        citatedIpcCode_4: details.citatedPatents.citatedIpcCode_4 || '',
+        citatedIpcCode_5: details.citatedPatents.citatedIpcCode_5 || '',
+        
+        familyNumber_1: details.familyPatents.familyNumber_1 || '',
+        familyNumber_2: details.familyPatents.familyNumber_2 || '',
+        familyNumber_3: details.familyPatents.familyNumber_3 || '',
+        familyNumber_4: details.familyPatents.familyNumber_4 || '',
+        familyNumber_5: details.familyPatents.familyNumber_5 || ''
       } as IBibliographic       
       
       fs.appendFile(params.files[0].filePath, `${Object.values(result).join(';')}\n`, err => err && console.log(`> saving file err`))

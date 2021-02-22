@@ -47,11 +47,36 @@ export const patentFiles = [{
     'applicantName', // 출원인명
     // 'inventors', // 발명인
     // 'claims', // 청구항
-    'ipcs', // IPC
-    'cpcs', // CPC
-    'citatingPatents', // 인용특허
-    'citatedPatents', // 피인용특허
-    'familyPatents' // 패밀리특허
+
+    'ipcCode_1', // IPC
+    'ipcCode_2',
+    'ipcCode_3',
+    'ipcCode_4',
+    'ipcCode_5',
+    
+    'cpcCode_1', // CPC
+    'cpcCode_2',
+    'cpcCode_3',
+    'cpcCode_4',
+    'cpcCode_5',
+
+    'citatingIpcCode_1', // 인용특허
+    'citatingIpcCode_2',
+    'citatingIpcCode_3',
+    'citatingIpcCode_4',
+    'citatingIpcCode_5',
+   
+    'citatedIpcCode_1', // 피인용특허
+    'citatedIpcCode_2',
+    'citatedIpcCode_3',
+    'citatedIpcCode_4',
+    'citatedIpcCode_5',
+    
+    'familyNumber_1', // 패밀리특허
+    'familyNumber_2',
+    'familyNumber_3',
+    'familyNumber_4',
+    'familyNumber_5'
   ]
 }]
 

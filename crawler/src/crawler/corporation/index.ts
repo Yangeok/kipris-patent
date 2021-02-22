@@ -126,7 +126,7 @@ export async function getCorpInfo ({ startDate, endDate, outputPath }: { startDa
     fs.writeFile('../current_applicant.log', `${JSON.stringify(i)}\nindex: ${idx}`, err => err && console.log(err))
 
     const result = await getList(page, { corpName: i.applicantName })
-    console.log(result)
+
     if (result) {
       file.write(saveCorpDetail(i.applicantNumber, result), err => err && console.log(`> saving file err`))
     }
