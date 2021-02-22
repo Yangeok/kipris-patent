@@ -1,4 +1,5 @@
 import { WriteStream } from 'fs'
+import { Indexable } from '../utils'
 
 // Patent
 export interface IApplicationNumber {
@@ -12,10 +13,10 @@ export interface IBibliographic extends IApplicationNumber {
   registerDate: string | Date // 등록일자
   publishNumber: string | number // 공개번호
   publishDate: string | Date // 공개일자
-  intlApplNumber: string | number // 국제출원번호
-  intlApplDate: string | Date // 국제출원일자
-  intlPublishNumber: string | number // 국제공개번호
-  intlPublishDate: string | Date // 국제공개일자
+  // intlApplNumber: string | number // 국제출원번호
+  // intlApplDate: string | Date // 국제출원일자
+  // intlPublishNumber: string | number // 국제공개번호
+  // intlPublishDate: string | Date // 국제공개일자
   claimReqDate: string | Date // 청구일자
   claimCount: string | number // 청구항수
   // astrtCont: string // 요약
@@ -76,7 +77,7 @@ export interface IFamilyPatent extends IApplicationNumber {
 export interface ICorpNumber {
   corpNumber: string | number // 법인번호
 }
-export interface ICorpOutline extends IApplicantNumber, ICorpNumber, IIncomeStatement, IFinancialStatement {
+export interface ICorpOutline extends IApplicantNumber, ICorpNumber, IIncomeStatement, IFinancialStatement, Indexable {
   businessNumber: string | number // 사업자번호
   repName: string // 법인대표자명
   estDate: string | Date // 법인설립일자
@@ -91,7 +92,7 @@ export interface ICorpOutline extends IApplicantNumber, ICorpNumber, IIncomeStat
   isPublic: string | boolean // 상장여부
 }
 
-export interface IIncomeStatement {
+export interface IIncomeStatement extends Indexable {
   revenue: string // 매출액
   salesCost: string // 매출원가
   sellingAndAdmnstExp: string // 판매비와관리비
@@ -99,7 +100,7 @@ export interface IIncomeStatement {
   profit: string // 수익
   grossProfitLoss: string // 매출총이익(손실)
   operatingProfitLoss: string // 영업이익(손실)
-  poofitBeforeIncomeTaxLoss: string // 법인세비용차감전계속사업이익(손실)
+  profitBeforeIncomeTaxLoss: string // 법인세비용차감전계속사업이익(손실)
   incomeTaxExp: string // 계속영업손익법인세비용(부의법인세비용)
   continuingOperatingProfitLoss: string // 계속영업이익(손실)
   discontinuedOperatingProfitLoss: string // 중단영업이익(손실)
@@ -108,12 +109,12 @@ export interface IIncomeStatement {
   comprehensiveIncome: string // 포괄손익
 }
 
-export interface IFinancialStatement {
+export interface IFinancialStatement extends Indexable {
   currentAssets: string // 유동자산
   nonCurrentAssets: string // 비유동자산
   currentLiabilities: string // 유동부채
   nonCurrentLiabilities: string // 비유동부채
-  totalAassets: string // 자산총계
+  totalAssets: string // 자산총계
   totalLiabilities: string // 부채총계
   totalEquity: string // 자본총계
   totalLiabilitiesAndEquity: string // 부채와자본총계

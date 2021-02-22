@@ -9,7 +9,7 @@ import { saveCorpDetail } from './saveDetail'
 
 import { csvWriteHeader } from '../../utils'
 import { getPlaywright, getProgressBar } from '../../middlewares'
-import { corpOutlineFields, koreanFinancialStatementFields, koreanIncomeStatementFields } from '../../constants'
+import { corpOutlineFields, financialStatementFields, incomeStatementFields, koreanFinancialStatementFields, koreanIncomeStatementFields } from '../../constants'
 
 dotenv.config()
 
@@ -83,8 +83,8 @@ async function getList(page: Page, params: {
     return { name, isPublic, details, incomeStatement: {}, financialStatement: {} }
   }
 
-  const incomeStatement = await getIncomeStatement(page, koreanIncomeStatementFields)
-  const financialStatement = await getFinancialStatement(page, koreanFinancialStatementFields)
+  const incomeStatement = await getIncomeStatement(page, koreanIncomeStatementFields, incomeStatementFields)
+  const financialStatement = await getFinancialStatement(page, koreanFinancialStatementFields, financialStatementFields)
 
   // 탭 닫기
   await page.click('.tab-layout-container .active .delete-tab')
@@ -126,6 +126,7 @@ export async function getCorpInfo ({ startDate, endDate, outputPath }: { startDa
     fs.writeFile('../current_applicant.log', `${JSON.stringify(i)}\nindex: ${idx}`, err => err && console.log(err))
 
     const result = await getList(page, { corpName: i.applicantName })
+    console.log(result)
     if (result) {
       file.write(saveCorpDetail(i.applicantNumber, result), err => err && console.log(`> saving file err`))
     }

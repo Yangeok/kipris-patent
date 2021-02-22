@@ -73,7 +73,7 @@ export async function getCorpMarketInfo (page: Page) {
   return fromEntries(data)
 }
 
-export async function getIncomeStatement (page: Page, arr: string[]) {
+export async function getIncomeStatement (page: Page, header: string[], enHeader: string[]) {
   const data = await page.evaluate(headers => {
     const years = (document.querySelector('#income-statement .rt-thead.-header .rt-tr') as HTMLElement).innerText.split('\n')
       .filter(i => !i.includes('(증권사 컨센서스 평균)'))
@@ -91,12 +91,16 @@ export async function getIncomeStatement (page: Page, arr: string[]) {
       }, {})
 
     return result
-  }, arr)
+  }, header)
 
-  return data
+  const refined = Object.keys(data).map((i, idx) => data[i].map((j: any, idx2: number) => ({ [`${enHeader[idx]}_${(2019 - idx2)}`]: j })))
+  const flattend = [].concat.apply([], refined) as any
+  const assigned = Object.assign.apply(Object, flattend)
+
+  return assigned
 }
 
-export async function getFinancialStatement (page: Page, arr: string[]) {
+export async function getFinancialStatement (page: Page, header: string[], enHeader: string[]) {
   const data = await page.evaluate(headers => {
     const years = (document.querySelector('#financial-statements .rt-thead.-header .rt-tr') as HTMLElement).innerText.split('\n')
       .map(i => i.includes('12-31') ? i.split('-')[0] : i)
@@ -113,7 +117,11 @@ export async function getFinancialStatement (page: Page, arr: string[]) {
       }, {})
 
     return result
-  }, arr)
+  }, header)
 
-  return data
+  const refined = Object.keys(data).map((i, idx) => data[i].map((j: any, idx2: number) => ({ [`${enHeader[idx]}_${(2019 - idx2)}`]: j })))
+  const flattend = [].concat.apply([], refined) as any
+  const assigned = Object.assign.apply(Object, flattend)
+
+  return assigned
 }
