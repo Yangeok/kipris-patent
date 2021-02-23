@@ -47,20 +47,31 @@ async function getList(page: Page, barl: SingleBar, params: {
     await page.waitForSelector('.board_pager03')
     
     fs.writeFile('../current_page.log', `currentPage: ${String(currentPage)}`, err => err && console.log(err))
-
-    if (params.startPage >= currentPage) {
+    
+    const pageToSkip = Math.floor(params.startPage / 10)
+    if (pageToSkip > currentPage ) { 
+      console.log('skip')
+      await Array.from({ length: pageToSkip }).reduce(async (prevPromise: any, _) => {  
+        await prevPromise
+        await page.click('.board_pager03 .next')
+        await page.waitForSelector('#loadingBarBack', { state: 'hidden' })
+        return
+      }, Promise.resolve())
+      currentPage += pageToSkip * 10
+    } else if (params.startPage >= currentPage) {
       Promise.all([
         await page.$eval('.board_pager03 strong', el => (el.nextElementSibling as HTMLElement).click()),
         await page.waitForSelector('#loadingBarBack', { state: 'hidden' })
       ])
+      currentPage += 1
     } else {
       Promise.all([
         await getListData(page, params),
         await page.$eval('.board_pager03 strong', el => (el.nextElementSibling as HTMLElement).click()),
         await page.waitForSelector('#loadingBarBack', { state: 'hidden' }),
       ])
+      currentPage += 1
     }
-    currentPage += 1
   }
 }
 
