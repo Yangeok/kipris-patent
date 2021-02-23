@@ -36,6 +36,7 @@ async function getList(page: Page, barl: SingleBar, params: {
   })
   await page.click('#pageSel img')
   await page.click('#pageSel a')
+  await page.waitForTimeout(250)
   await page.waitForSelector('#loadingBarBack', { state: 'hidden' })
 
   // 페이지 카운트
@@ -50,7 +51,6 @@ async function getList(page: Page, barl: SingleBar, params: {
     
     const pageToSkip = Math.floor(params.startPage / 10)
     if (pageToSkip > currentPage ) { 
-      console.log('skip')
       await Array.from({ length: pageToSkip }).reduce(async (prevPromise: any, _) => {  
         await prevPromise
         await page.click('.board_pager03 .next')
