@@ -77,7 +77,7 @@ export interface IFamilyPatent extends IApplicationNumber {
 export interface ICorpNumber {
   corpNumber: string | number // 법인번호
 }
-export interface ICorpOutline extends IApplicantNumber, ICorpNumber, IIncomeStatement, IFinancialStatement, Indexable {
+export interface ICorpOutline extends IApplicantNumber, ICorpNumber, IIncomeStatement, IFinancialStatement {
   businessNumber: string | number // 사업자번호
   repName: string // 법인대표자명
   estDate: string | Date // 법인설립일자
@@ -92,7 +92,7 @@ export interface ICorpOutline extends IApplicantNumber, ICorpNumber, IIncomeStat
   isPublic: string | boolean // 상장여부
 }
 
-export interface IIncomeStatement extends Indexable {
+export interface IIncomeStatement {
   revenue: string // 매출액
   salesCost: string // 매출원가
   sellingAndAdmnstExp: string // 판매비와관리비
@@ -109,7 +109,7 @@ export interface IIncomeStatement extends Indexable {
   comprehensiveIncome: string // 포괄손익
 }
 
-export interface IFinancialStatement extends Indexable {
+export interface IFinancialStatement {
   currentAssets: string // 유동자산
   nonCurrentAssets: string // 비유동자산
   currentLiabilities: string // 유동부채

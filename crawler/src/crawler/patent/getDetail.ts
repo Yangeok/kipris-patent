@@ -21,7 +21,6 @@ export const getDataSummaries = async (page: Page) => {
   })
   return data
 }
-
 export const getContentCount = async (page: Page) => {
   const data = await page.evaluate(() => {
     return {
@@ -33,7 +32,6 @@ export const getContentCount = async (page: Page) => {
 
   return data
 }
-
 export const getBibliographic = (html: any) => {
   const newDocument = parse(html)
   
@@ -77,12 +75,14 @@ export const getIpcs = (html: any) => {
       date: i.split('(')[1]?.replace(/\./g, '-')
   })).filter(i => i.date !== undefined)
 
-  const refined = ipcs.map((i, idx) => ({ 
-    [`ipcCode_${idx + 1}`]: i.code
-  })) as any
-  const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
+  // const refined = ipcs.map((i, idx) => ({ 
+  //   [`ipcCode_${idx + 1}`]: i.code
+  // })) as any
+  // const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
 
-  return assigned
+  // return assigned
+
+  return ipcs
 }
 export const getCpcs = (html: any) => {
   const newDocument = parse(html)
@@ -97,12 +97,13 @@ export const getCpcs = (html: any) => {
     date: i.split('(')[1]?.replace(/\./g, '-')
   })).filter(i => i.date !== undefined)
 
-  const refined = cpcs.map((i, idx) => ({ 
-    [`ipcCode_${idx + 1}`]: i.code
-  })) as any
-  const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
+  // const refined = cpcs.map((i, idx) => ({ 
+  //   [`ipcCode_${idx + 1}`]: i.code
+  // })) as any
+  // const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
 
-  return assigned
+  // return assigned
+  return cpcs
 }
 export const getApplicants = (html: any) => {
   const newDocument = parse(html)
@@ -181,13 +182,14 @@ export const getCitatingPatents = (html: any, header: string[]) => {
   const citating = citatingValues
     .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))) : '')
 
-  const refined = citating.map((i, idx) => ({ 
-    [`citatingPublishNumber_${idx + 1}`]: i.publishNumber,
-    [`citatingIpcCode_${idx + 1}`]: i.ipcCode
-  })) as any
-  const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
+  // const refined = citating.map((i, idx) => ({ 
+  //   [`citatingPublishNumber_${idx + 1}`]: i.publishNumber,
+  //   [`citatingIpcCode_${idx + 1}`]: i.ipcCode
+  // })) as any
+  // const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
   
-  return assigned
+  // return assigned
+  return citating
 }
 export const getCitatedPatents = (html: any, header: string[]) => {
   const newDocument = parse(html)
@@ -202,13 +204,14 @@ export const getCitatedPatents = (html: any, header: string[]) => {
   const citated = citatedValues
     .map(i => i.length > 1 ? fromEntries(i.map((j, index) => ([ header[index], j ]))): '')
 
-  const refined = citated.map((i, idx) => ({ 
-    [`citatedApplicationNumber_${idx + 1}`]: i.applicationNumber,
-    [`citatedIpcCode_${idx + 1}`]: i.ipcCode
-  })) as any    
-  const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
+  // const refined = citated.map((i, idx) => ({ 
+  //   [`citatedApplicationNumber_${idx + 1}`]: i.applicationNumber,
+  //   [`citatedIpcCode_${idx + 1}`]: i.ipcCode
+  // })) as any    
+  // const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
 
-  return assigned
+  // return assigned
+  return citated
 }
 export const getFamilyPatents = (html: any, header: string[]) => {
   const newDocument = parse(html)
@@ -223,10 +226,11 @@ export const getFamilyPatents = (html: any, header: string[]) => {
     .filter(i => i.length)
     .map(i => fromEntries(i.map((j, index) => ([ header[index], j]))))
 
-  const refined = familyPatents.map((i, idx) => ({ 
-    [`familyNumber_${idx + 1}`]: i.number,
-  })) as any
+  // const refined = familyPatents.map((i, idx) => ({ 
+  //   [`familyNumber_${idx + 1}`]: i.number,
+  // })) as any
 
-  const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
-  return assigned
+  // const assigned = refined.length > 0 ? Object.assign.apply(Object, refined) : {}
+  // return assigned
+  return familyPatents
 }
