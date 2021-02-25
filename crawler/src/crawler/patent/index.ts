@@ -53,19 +53,21 @@ async function getList(page: Page, barl: SingleBar, params: {
     if (pageToSkip > currentPage ) { 
       await Array.from({ length: pageToSkip }).reduce(async (prevPromise: any, _) => {  
         await prevPromise
-        await page.click('.board_pager03 .next')
-        await page.waitForSelector('#loadingBarBack', { state: 'hidden' })
+        await Promise.all([
+          await page.click('.board_pager03 .next'),
+          await page.waitForSelector('#loadingBarBack', { state: 'hidden' })
+        ])
         return
       }, Promise.resolve())
       currentPage += pageToSkip * 10
     } else if (params.startPage >= currentPage) {
-      Promise.all([
+      await Promise.all([
         await page.$eval('.board_pager03 strong', el => (el.nextElementSibling as HTMLElement).click()),
         await page.waitForSelector('#loadingBarBack', { state: 'hidden' })
       ])
       currentPage += 1
     } else {
-      Promise.all([
+      await Promise.all([
         await getListData(page, params),
         await page.$eval('.board_pager03 strong', el => (el.nextElementSibling as HTMLElement).click()),
         await page.waitForSelector('#loadingBarBack', { state: 'hidden' }),

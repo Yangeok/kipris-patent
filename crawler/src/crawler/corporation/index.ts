@@ -35,17 +35,12 @@ async function getList(page: Page, params: {
   corpName: string
 }) {
   // 검색
-  await page.waitForTimeout(1000)
   await page.waitForSelector('.search-bar')
   await page.$eval('#main-app-bar-search', (el: HTMLInputElement, cpName: string) => el.value = cpName, params.corpName.replace('주식회사', '').replace('(주)', ''))
   await page.click('.icon-search')
-  // const searchButton = await page.$('.icon-search')
-  // if (searchButton) {
-  //   await searchButton?.click()
-  // }
   
   // 검색결과 슬라이싱
-  await page.waitForTimeout(2000)
+  await page.waitForSelector('.not-found-message')
   const notFound = await page.$('.not-found-message')
   if (notFound) {
     return
@@ -65,8 +60,8 @@ async function getList(page: Page, params: {
     return
   }
 
-  await page.waitForTimeout(3000)
-  await page.waitForSelector('.nav-tab-menu.company-tabs')
+  // await page.waitForTimeout(1000)
+  await Promise.all([await page.waitForSelector('.nav-tab-menu.company-tabs')])
   
   const name = await getCorpName(page)
   const isPublic = await getIsPublic(page)
