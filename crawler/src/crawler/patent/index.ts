@@ -258,7 +258,7 @@ export async function getPatentInfo ({
   startPage: number 
 }) {
   const files = patentFiles.map(i => {
-    const filePath = path.join(__dirname, outputPath, `${i.name}-${startDate}-${endDate}.csv`)
+    const filePath = path.join(__dirname, outputPath, `${i.name}-${startDate}-${endDate}-lake.csv`)
     const file = fs.createWriteStream(filePath, 'utf-8')
     file.write(csvWriteHeader(i.fields))
 
